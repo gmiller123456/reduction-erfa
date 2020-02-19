@@ -1,24 +1,28 @@
 <html>
 <head>
-	<title>Reduction</title>
+	<title>Test</title>
 </head>
 <body>
-<h1>Reduction</h1>
+<h1>Test</h1>
 <script src="ascp2000.405.js"></script>
 <script src="de405.js"></script>
 <script src="iau2000a.js"></script>
 
 <form>
-Julian Date:<input id='jdInput' type=text value=2458850.5><input type=button value="Compute" onclick='computeValues();'><br>
 
 <script>
+'use strict'
 
 const au= 149597870.691;
 const T0 = 2451545.00000000;
 const ASEC360 = 1296000.0;
 const ASEC2RAD = 4.848136811095359935899141e-6;
 const TWOPI=Math.PI*2;
-
+const DEG2RAD=Math.PI/180.0;
+const ERAD = 6378136.6;
+const F = 0.003352819697896;
+const ANGVEL = 7.2921150e-5;
+const AU_KM = 1.4959787069098932e+8;
 
 const year = 2008;
 const month = 4;
@@ -32,9 +36,10 @@ const leap_secs = 33;
 
 const de=new DE405();
 
-reduce();
+const observer={'latitude': 42.0, 'longitude': -70.0, 'height': 0.0};
+reduce(observer,9);
 
-function reduce(){
+function reduce(observer,bodyNumber){
 	const jd_utc=dateToJulianDate(year,month,day,hour,min,sec);
 	const jd_tt = jd_utc + (leap_secs + 32.184) / 86400.0;
 	const jd_ut1 = jd_utc + ut1_utc / 86400.0;
@@ -45,26 +50,633 @@ function reduce(){
 	const earth=de.getEarth(jd_tdb);
 	const sun=de.getAllPropertiesForSeries(10,jd_tdb);
 
-	const geopv=geo_posvel(jd_tt,delta_t);
+	console.log(observer);
+
+	const geopv=geo_posvel(jd_tt,delta_t,observer);
+	
+	const pvb=new Array();
+	for(let i=0;i<6;i++){
+		pvb[i]=geopv[i]+earth[i]/AU_KM;
+	}
+
+	const pv1=de.getAllPropertiesForSeries(bodyNumber,jd_tdb);
+	for(let i=0;i<6;i++){
+		pv1[i]=earth[i]/AU_KM+pv1[i]/AU_KM;
+	}
+	console.log(pv1);
 
 	//TODO: ...
 }
 
-function geo_posvel(jd_tt,delta_t){
+function geo_posvel(jd_tt,delta_t,obs){
 	const jd_tdb=tt2tdb(jd_tt);
 	const jd_ut1 = jd_tt - (delta_t / 86400.0);
 
 	const gmst=sidereal_time (jd_ut1,delta_t,0,1);
-	const eqeq=e_tilt(jd_tdb);
+	const eqeq=e_tilt(jd_tdb)[2];
+	const gast=gmst+eqeq/3600.0;
+	
+	const pv1=terra(obs,gast);
 
-	//TODO: ...
+   const pos2=nutation (jd_tdb,-1,pv1);
+   const pos3=precession (jd_tdb,pos2,T0);
+   const pos4=frame_tie (pos3,-1);
+
+   const vel1=new Array();
+   vel1[0]=pv1[3];
+   vel1[1]=pv1[4];
+   vel1[2]=pv1[5];
+
+   const vel2=nutation (jd_tdb,-1,vel1);
+   const vel3=precession (jd_tdb,vel2,T0);
+   const vel4=frame_tie (vel3,-1);
+
+   const temp=new Array();
+   temp[0]=pos4[0];
+   temp[1]=pos4[1];
+   temp[2]=pos4[2];
+   temp[3]=vel4[0];
+   temp[4]=vel4[1];
+   temp[5]=vel4[2];
+
+   return temp;
+
+}
+
+function frame_tie(pos1,direction){
+	const pos2=new Array();
+/*
+   'xi0', 'eta0', and 'da0' are ICRS frame biases in arcseconds taken
+   from IERS (2003) Conventions, Chapter 5.
+*/
+
+   const xi0  = -0.0166170;
+   const eta0 = -0.0068192;
+   const da0  = -0.01460;
+   var  xx, yx, zx, xy, yy, zy, xz, yz, zz;
+
+/*
+   Compute elements of rotation matrix to first order the first time
+   this function is called.  Elements will be saved for future use and
+   not recomputed.
+*/
+
+      xx =  1.0;
+      yx = -da0  * ASEC2RAD;
+      zx =  xi0  * ASEC2RAD;
+      xy =  da0  * ASEC2RAD;
+      yy =  1.0;
+      zy =  eta0 * ASEC2RAD;
+      xz = -xi0  * ASEC2RAD;
+      yz = -eta0 * ASEC2RAD;
+      zz =  1.0;
+
+/*
+   Include second-order corrections to diagonal elements.
+*/
+
+      xx = 1.0 - 0.5 * (yx * yx + zx * zx);
+      yy = 1.0 - 0.5 * (yx * yx + zy * zy);
+      zz = 1.0 - 0.5 * (zy * zy + zx * zx);
+
+
+/*
+   Perform the rotation in the sense specified by 'direction'.
+*/
+
+   if (direction < 0)
+   {
+
+/*
+   Perform rotation from dynamical system to ICRS.
+*/
+
+      pos2[0] = xx * pos1[0] + yx * pos1[1] + zx * pos1[2];
+      pos2[1] = xy * pos1[0] + yy * pos1[1] + zy * pos1[2];
+      pos2[2] = xz * pos1[0] + yz * pos1[1] + zz * pos1[2];
+   }
+    else
+   {
+
+/*
+   Perform rotation from ICRS to dynamical system.
+*/
+
+      pos2[0] = xx * pos1[0] + xy * pos1[1] + xz * pos1[2];
+      pos2[1] = yx * pos1[0] + yy * pos1[1] + yz * pos1[2];
+      pos2[2] = zx * pos1[0] + zy * pos1[1] + zz * pos1[2];
+   }
+
+
+
+	return pos2;
+}
+
+function precession(jd_tdb1, pos1, jd_tdb2){
+	const pos2=new Array();
+
+   var xx, yx, zx, xy, yy, zy, xz, yz, zz;
+   var eps0 = 84381.406;
+   var  t, psia, omegaa, chia, sa, ca, sb, cb, sc, cc, sd, cd;
+
+/*
+   Check to be sure that either 'jd_tdb1' or 'jd_tdb2' is equal to T0.
+*/
+
+   if ((jd_tdb1 != T0) && (jd_tdb2 != T0))
+      return (error = 1);
+
+/*
+   't' is time in TDB centuries between the two epochs.
+*/
+
+   t = (jd_tdb2 - jd_tdb1) / 36525.0;
+
+   if (jd_tdb2 == T0)
+      t = -t;
+
+
+/*
+   Numerical coefficients of psi_a, omega_a, and chi_a, along with
+   epsilon_0, the obliquity at J2000.0, are 4-angle formulation from
+   Capitaine et al. (2003), eqs. (4), (37), & (39).
+*/
+
+      psia   = ((((-    0.0000000951  * t
+                   +    0.000132851 ) * t
+                   -    0.00114045  ) * t
+                   -    1.0790069   ) * t
+                   + 5038.481507    ) * t;
+
+      omegaa = ((((+    0.0000003337  * t
+                   -    0.000000467 ) * t
+                   -    0.00772503  ) * t
+                   +    0.0512623   ) * t
+                   -    0.025754    ) * t + eps0;
+
+      chia   = ((((-    0.0000000560  * t
+                   +    0.000170663 ) * t
+                   -    0.00121197  ) * t
+                   -    2.3814292   ) * t
+                   +   10.556403    ) * t;
+
+      eps0 = eps0 * ASEC2RAD;
+      psia = psia * ASEC2RAD;
+      omegaa = omegaa * ASEC2RAD;
+      chia = chia * ASEC2RAD;
+
+      sa = Math.sin (eps0);
+      ca = Math.cos (eps0);
+      sb = Math.sin (-psia);
+      cb = Math.cos (-psia);
+      sc = Math.sin (-omegaa);
+      cc = Math.cos (-omegaa);
+      sd = Math.sin (chia);
+      cd = Math.cos (chia);
+/*
+   Compute elements of precession rotation matrix equivalent to
+   R3(chi_a) R1(-omega_a) R3(-psi_a) R1(epsilon_0).
+*/
+
+      xx =  cd * cb - sb * sd * cc;
+      yx =  cd * sb * ca + sd * cc * cb * ca - sa * sd * sc;
+      zx =  cd * sb * sa + sd * cc * cb * sa + ca * sd * sc;
+      xy = -sd * cb - sb * cd * cc;
+      yy = -sd * sb * ca + cd * cc * cb * ca - sa * cd * sc;
+      zy = -sd * sb * sa + cd * cc * cb * sa + ca * cd * sc;
+      xz =  sb * sc;
+      yz = -sc * cb * ca - sa * cc;
+      zz = -sc * cb * sa + cc * ca;
+
+
+   if (jd_tdb2 == T0)
+   {
+
+/*
+   Perform rotation from epoch to J2000.0.
+*/
+      pos2[0] = xx * pos1[0] + xy * pos1[1] + xz * pos1[2];
+      pos2[1] = yx * pos1[0] + yy * pos1[1] + yz * pos1[2];
+      pos2[2] = zx * pos1[0] + zy * pos1[1] + zz * pos1[2];
+   }
+    else
+   {
+
+/*
+   Perform rotation from J2000.0 to epoch.
+*/
+
+      pos2[0] = xx * pos1[0] + yx * pos1[1] + zx * pos1[2];
+      pos2[1] = xy * pos1[0] + yy * pos1[1] + zy * pos1[2];
+      pos2[2] = xz * pos1[0] + yz * pos1[1] + zz * pos1[2];
+   }
+
+	return pos2;
+}
+
+function nutation (jd_tdb, direction, pos){
+	const pos2=new Array();
+   var cobm, sobm, cobt, sobt, cpsi, spsi, xx, yx, zx, xy, yy, zy,
+      xz, yz, zz, oblm, oblt, eqeq, psi, eps;
+
+/*
+   Call 'e_tilt' to get the obliquity and nutation angles.
+*/
+
+   const values=e_tilt (jd_tdb);
+
+    oblm=values[0];
+    oblt=values[1];
+    eqeq=values[2];
+    psi=values[3];
+    eps=values[4];
+
+   cobm = Math.cos (oblm * DEG2RAD);
+   sobm = Math.sin (oblm * DEG2RAD);
+   cobt = Math.cos (oblt * DEG2RAD);
+   sobt = Math.sin (oblt * DEG2RAD);
+   cpsi = Math.cos (psi * ASEC2RAD);
+   spsi = Math.sin (psi * ASEC2RAD);
+
+/*
+   Nutation rotation matrix follows.
+*/
+
+   xx = cpsi;
+   yx = -spsi * cobm;
+   zx = -spsi * sobm;
+   xy = spsi * cobt;
+   yy = cpsi * cobm * cobt + sobm * sobt;
+   zy = cpsi * sobm * cobt - cobm * sobt;
+   xz = spsi * sobt;
+   yz = cpsi * cobm * sobt - sobm * cobt;
+   zz = cpsi * sobm * sobt + cobm * cobt;
+
+   if (!direction)
+   {
+
+/*
+   Perform rotation.
+*/
+
+      pos2[0] = xx * pos[0] + yx * pos[1] + zx * pos[2];
+      pos2[1] = xy * pos[0] + yy * pos[1] + zy * pos[2];
+      pos2[2] = xz * pos[0] + yz * pos[1] + zz * pos[2];
+   }
+    else
+   {
+
+/*
+   Perform inverse rotation.
+*/
+
+      pos2[0] = xx * pos[0] + xy * pos[1] + xz * pos[2];
+      pos2[1] = yx * pos[0] + yy * pos[1] + yz * pos[2];
+      pos2[2] = zx * pos[0] + zy * pos[1] + zz * pos[2];
+   }
+
+	return pos2;
+}
+
+function terra(location,st){
+   var j;
+
+   var erad_km, ht_km;
+   var df, df2, phi, sinphi, cosphi, c, s, ach, ash, stlocl, sinst, cosst;
+
+  erad_km = ERAD / 1000.0;
+
+/*
+   Compute parameters relating to geodetic to geocentric conversion.
+*/
+
+   df = 1.0 - F;
+   df2 = df * df;
+
+   phi = location.latitude * DEG2RAD;
+   sinphi = Math.sin (phi);
+   cosphi = Math.cos (phi);
+   c = 1.0 / Math.sqrt (cosphi * cosphi + df2 * sinphi * sinphi);
+   s = df2 * c;
+   ht_km = location.height / 1000.0;
+   ach = erad_km * c + ht_km;
+   ash = erad_km * s + ht_km;
+
+/*
+   Compute local sidereal time factors at the observer's longitude.
+*/
+
+   stlocl = (st * 15.0 + location.longitude) * DEG2RAD;
+   sinst = Math.sin (stlocl);
+   cosst = Math.cos (stlocl);
+
+/*
+   Compute position vector components in kilometers.
+*/
+	const pv=new Array();
+
+   pv[0] = ach * cosphi * cosst;
+   pv[1] = ach * cosphi * sinst;
+   pv[2] = ash * sinphi;
+
+/*
+   Compute velocity vector components in kilometers/sec.
+*/
+
+   pv[3] = -ANGVEL * ach * cosphi * sinst;
+   pv[4] =  ANGVEL * ach * cosphi * cosst;
+   pv[5] =  0.0;
+
+/*
+   Convert position and velocity components to AU and AU/DAY.
+*/
+
+   for (j = 0; j < 3; j++)
+   {
+      pv[j] /= AU_KM;
+      pv[j+3] /= AU_KM;
+      pv[j+3] *= 86400.0;
+   }
+
+   return pv;
+
 }
 
 function e_tilt(jd_tdb){
 	const t = (jd_tdb - T0) / 36525.0;
 
-	nutation_angles(t);
-	//TODO:...
+	const angles=nutation_angles(t);
+	const c_terms = ee_ct (jd_tdb,0.0) / ASEC2RAD;
+
+	//TODO: define PSI_COR and EPS_COR
+   const d_psi=angles[0];
+   const d_eps=angles[1];
+   //d_psi = dp + PSI_COR;
+   //d_eps = de + EPS_COR;
+
+	let mean_ob = mean_obliq (jd_tdb);
+	let true_ob = mean_ob + d_eps;
+
+   mean_ob /= 3600.0;
+   true_ob /= 3600.0;
+
+
+   let eq_eq = d_psi * Math.cos (mean_ob * DEG2RAD) + c_terms;
+   eq_eq /= 15.0;
+
+   const temp=new Array();
+   temp[0] = mean_ob;
+   temp[1] = true_ob;
+   temp[2] = eq_eq;
+   temp[3] = d_psi;
+   temp[4] = d_eps;
+
+   return temp;
+}
+
+function mean_obliq (jd_tdb){
+   const t = (jd_tdb - T0) / 36525.0;
+
+/*
+   Compute the mean obliquity in arcseconds.  Use expression from the
+   reference's eq. (39) with obliquity at J2000.0 taken from eq. (37)
+   or Table 8.
+*/
+
+   const epsilon = (((( -  0.0000000434   * t
+                  -  0.000000576  ) * t
+                  +  0.00200340   ) * t
+                  -  0.0001831    ) * t
+                  - 46.836769     ) * t + 84381.406;
+
+   return (epsilon);
+
+}
+
+function norm_ang(angle){
+
+   let a;
+
+   a = fmod (angle,TWOPI);
+   if (a < 0.0)
+         a += TWOPI;
+
+   return (a);
+
+}
+
+function ee_ct(jd_high,jd_low){
+   var i, j;
+
+   var t, fa, fa2, s0, s1, a, c_terms;
+   fa=new Array();
+   fa2=new Array();
+
+/*
+   Argument coefficients for t^0.
+*/
+
+   const ke0_t = [
+     [0,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [0,  0,  0,  0,  2,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [0,  0,  2, -2,  3,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [0,  0,  2, -2,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [0,  0,  2, -2,  2,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [0,  0,  2,  0,  3,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [0,  0,  2,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [0,  0,  0,  0,  3,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [0,  1,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [0,  1,  0,  0, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [1,  0,  0,  0, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [1,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [0,  1,  2, -2,  3,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [0,  1,  2, -2,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [0,  0,  4, -4,  4,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [0,  0,  1, -1,  1,  0, -8, 12,  0,  0,  0,  0,  0,  0],
+     [0,  0,  2,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [0,  0,  2,  0,  2,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [1,  0,  2,  0,  3,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [1,  0,  2,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [0,  0,  2, -2,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [0,  1, -2,  2, -3,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [0,  1, -2,  2, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [0,  0,  0,  0,  0,  0,  8,-13,  0,  0,  0,  0,  0, -1],
+     [0,  0,  0,  2,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [2,  0, -2,  0, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [1,  0,  0, -2,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [0,  1,  2, -2,  2,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [1,  0,  0, -2, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [0,  0,  4, -2,  4,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [0,  0,  2, -2,  4,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [1,  0, -2,  0, -3,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+     [1,  0, -2,  0, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0]];
+
+/*
+   Argument coefficients for t^1.
+*/
+
+   const ke1 =
+      [0,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0];
+
+/*
+   Sine and cosine coefficients for t^0.
+*/
+
+   const se0_t = [
+      [+2640.96e-6,          -0.39e-6],
+      [  +63.52e-6,          -0.02e-6],
+      [  +11.75e-6,          +0.01e-6],
+      [  +11.21e-6,          +0.01e-6],
+      [   -4.55e-6,          +0.00e-6],
+      [   +2.02e-6,          +0.00e-6],
+      [   +1.98e-6,          +0.00e-6],
+      [   -1.72e-6,          +0.00e-6],
+      [   -1.41e-6,          -0.01e-6],
+      [   -1.26e-6,          -0.01e-6],
+      [   -0.63e-6,          +0.00e-6],
+      [   -0.63e-6,          +0.00e-6],
+      [   +0.46e-6,          +0.00e-6],
+      [   +0.45e-6,          +0.00e-6],
+      [   +0.36e-6,          +0.00e-6],
+      [   -0.24e-6,          -0.12e-6],
+      [   +0.32e-6,          +0.00e-6],
+      [   +0.28e-6,          +0.00e-6],
+      [   +0.27e-6,          +0.00e-6],
+      [   +0.26e-6,          +0.00e-6],
+      [   -0.21e-6,          +0.00e-6],
+      [   +0.19e-6,          +0.00e-6],
+      [   +0.18e-6,          +0.00e-6],
+      [   -0.10e-6,          +0.05e-6],
+      [   +0.15e-6,          +0.00e-6],
+      [   -0.14e-6,          +0.00e-6],
+      [   +0.14e-6,          +0.00e-6],
+      [   -0.14e-6,          +0.00e-6],
+      [   +0.14e-6,          +0.00e-6],
+      [   +0.13e-6,          +0.00e-6],
+      [   -0.11e-6,          +0.00e-6],
+      [   +0.11e-6,          +0.00e-6],
+      [   +0.11e-6,          +0.00e-6]];
+/*
+   Sine and cosine coefficients for t^1.
+*/
+
+   const se1 =
+      [   -0.87e-6,          +0.00e-6];
+
+/*
+   Interval between fundamental epoch J2000.0 and current date.
+*/
+
+      t = ((jd_high - T0) + jd_low) / 36525.0;
+
+/*
+   High accuracy mode.
+*/
+
+
+/*
+   Fundamental Arguments.
+
+   Mean Anomaly of the Moon.
+*/
+
+      fa[0] = norm_ang ((485868.249036 +
+                         (715923.2178 +
+                         (    31.8792 +
+                         (     0.051635 +
+                         (    -0.00024470)
+                         * t) * t) * t) * t) * ASEC2RAD
+                         + fmod (1325.0*t, 1.0) * TWOPI);
+
+/*
+   Mean Anomaly of the Sun.
+*/
+
+      fa[1] = norm_ang ((1287104.793048 +
+                         (1292581.0481 +
+                         (     -0.5532 +
+                         (     +0.000136 +
+                         (     -0.00001149)
+                         * t) * t) * t) * t) * ASEC2RAD
+                         + fmod (99.0*t, 1.0) * TWOPI);
+
+/*
+   Mean Longitude of the Moon minus Mean Longitude of the Ascending
+   Node of the Moon.
+*/
+
+      fa[2] = norm_ang (( 335779.526232 +
+                         ( 295262.8478 +
+                         (    -12.7512 +
+                         (     -0.001037 +
+                         (      0.00000417)
+                         * t) * t) * t) * t) * ASEC2RAD
+                         + fmod (1342.0*t, 1.0) * TWOPI);
+
+/*
+   Mean Elongation of the Moon from the Sun.
+*/
+
+      fa[3] = norm_ang ((1072260.703692 +
+                         (1105601.2090 +
+                         (     -6.3706 +
+                         (      0.006593 +
+                         (     -0.00003169)
+                         * t) * t) * t) * t) * ASEC2RAD
+                         + fmod (1236.0*t, 1.0) * TWOPI);
+
+/*
+   Mean Longitude of the Ascending Node of the Moon.
+*/
+
+      fa[4] = norm_ang (( 450160.398036 +
+                         (-482890.5431 +
+                         (      7.4722 +
+                         (      0.007702 +
+                         (     -0.00005939)
+                         * t) * t) * t) * t) * ASEC2RAD
+                         + fmod (-5.0*t, 1.0) * TWOPI);
+
+      fa[ 5] = norm_ang (4.402608842 + 2608.7903141574 * t);
+      fa[ 6] = norm_ang (3.176146697 + 1021.3285546211 * t);
+      fa[ 7] = norm_ang (1.753470314 +  628.3075849991 * t);
+      fa[ 8] = norm_ang (6.203480913 +  334.0612426700 * t);
+      fa[ 9] = norm_ang (0.599546497 +   52.9690962641 * t);
+      fa[10] = norm_ang (0.874016757 +   21.3299104960 * t);
+      fa[11] = norm_ang (5.481293872 +    7.4781598567 * t);
+      fa[12] = norm_ang (5.311886287 +    3.8133035638 * t);
+      fa[13] =          (0.024381750 +    0.00000538691 * t) * t;
+
+/*
+   Evaluate the complementary terms.
+*/
+
+      s0 = 0.0;
+      s1 = 0.0;
+
+      for (i = 32; i >= 0; i--)
+      {
+         a = 0.0;
+
+         for (j = 0; j < 14; j++)
+         {
+            a += ke0_t[i][j] * fa[j];
+         }
+
+         s0 += (se0_t[i][0] * Math.sin (a) + se0_t[i][1] * Math.cos (a));
+      }
+
+      a = 0.0;
+
+      for (j = 0; j < 14; j++)
+      {
+         a +=  (ke1[j]) * fa[j];
+      }
+
+      s1 += (se1[0] * Math.sin (a) + se1[1] * Math.cos (a));
+
+      c_terms = (s0 + s1 * t);
+      return c_terms*ASEC2RAD;
 
 }
 
@@ -76,17 +688,15 @@ function nutation_angles (t){
    angles[0] /= ASEC2RAD; //dpsi
    angles[1] /= ASEC2RAD; //deps
 
-   console.log(angles);
-
    return angles;
 }
 
 
 function sidereal_time(jd_ut,delta_t,gst_type,method){
 	const jd_tt = jd_ut + (delta_t / 86400.0);
-	theta = era (jd_ut,0);
+	const theta = era (jd_ut,0);
 	const jd_tdb=tt2tdb(jd_tt);
-	t = (jd_tdb - T0) / 36525.0;
+	const t = (jd_tdb - T0) / 36525.0;
 
 	let eqeq=0.0;
 
