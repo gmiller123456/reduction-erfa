@@ -3,7 +3,7 @@
 	<title>Test</title>
 </head>
 <body>
-<h1>Test</h1>
+<h1></h1>
 <script src="ascp2000.405.js"></script>
 <script src="de405.js"></script>
 <script src="iau2000a.js"></script>
@@ -23,6 +23,9 @@ const ERAD = 6378136.6;
 const F = 0.003352819697896;
 const ANGVEL = 7.2921150e-5;
 const AU_KM = 1.4959787069098932e+8;
+const C_AUDAY = 173.1446326846693;
+const AU = 1.4959787069098932e+11;
+const RAD2DEG = 57.295779513082321;
 
 const year = 2008;
 const month = 4;
@@ -47,25 +50,232 @@ function reduce(observer,bodyNumber){
 
 	const jd_tdb=tt2tdb(jd_tt);
 
-	const earth=de.getEarth(jd_tdb);
-	const sun=de.getAllPropertiesForSeries(10,jd_tdb);
-
-	console.log(observer);
+	const earth=getBodyPV(2,jd_tdb);
+	const sun=getBodyPV(10,jd_tdb);
 
 	const geopv=geo_posvel(jd_tt,delta_t,observer);
-	
 	const pvb=new Array();
 	for(let i=0;i<6;i++){
-		pvb[i]=geopv[i]+earth[i]/AU_KM;
+		pvb[i]=geopv[i]+earth[i];
 	}
 
-	const pv1=de.getAllPropertiesForSeries(bodyNumber,jd_tdb);
+	const pv1=getBodyPV(bodyNumber,jd_tdb);
+
+	const pos2=new Array();
 	for(let i=0;i<6;i++){
-		pv1[i]=earth[i]/AU_KM+pv1[i]/AU_KM;
+		pos2[i]=pv1[i]-pvb[i];
 	}
-	console.log(pv1);
 
+   let lighttime = Math.sqrt (pos2[0] * pos2[0] + pos2[1] * pos2[1] + pos2[2] * pos2[2]) / C_AUDAY;
+
+	let pos3=getBodyPV(bodyNumber,jd_tdb-lighttime);
+
+	for(let i=0;i<6;i++){
+		pos3[i]=pos3[i]-pvb[i];
+	}
+	lighttime = Math.sqrt (pos3[0] * pos3[0] + pos3[1] * pos3[1] + pos3[2] * pos3[2]) / C_AUDAY;
+
+	const temp=limb_angle(pos3,geopv);
+	const frlimb=temp[1];
+	let loc=1;
+	if (frlimb < 0.8) loc = 0;
+
+	const pos4=grav_def (jd_tdb,loc,pos3,pvb);
+
+	const vob=new Array();
+	vob[0]=pvb[3]; vob[1]=pvb[4]; vob[2]=pvb[5]; 
+	const pos5=aberration (pos4,vob,lighttime);
+
+    const pos6=frame_tie (pos5,1);
+    const pos7=precession (T0,pos6,jd_tdb);
+console.log(pos7);
+    const pos8=nutation (jd_tdb,0,pos7);
+
+
+console.log(pos8);
+	const ret=vector2radec(pos8);
+    ret[2]=lighttime*C_AUDAY;
+
+    console.log(ret);
+    return ret;
 	//TODO: ...
+}
+
+function vector2radec (pos)
+{
+   let xyproj;
+   let ra,dec;
+
+   xyproj = Math.sqrt (pos[0] * pos[0] + pos[1] * pos[1]);
+   if ((xyproj == 0.0) && (pos[2] == 0))
+   {
+      ra = 0.0;
+      dec = 0.0;
+      return 1;
+   }
+    else if (xyproj == 0.0)
+   {
+      ra = 0.0;
+      if (pos[2] < 0.0)
+         dec = -90.0;
+       else
+         dec = 90.0;
+      return 2;
+   }
+    else
+   {
+      ra = Math.atan2 (pos[1], pos[0]) / ASEC2RAD / 54000.0;
+      dec = Math.atan2 (pos[2], xyproj) / ASEC2RAD / 3600.0;
+
+      if (ra < 0.0)
+         ra += 24.0;
+   }
+
+   const temp=new Array();
+   temp[0]=ra;
+   temp[1]=dec;
+   return temp;
+}
+
+
+function aberration (pos, ve, lighttime)
+{
+   var p1mag, vemag, beta, dot, cosd, gammai, p, q, r;
+
+   if (lighttime == 0.0)
+   {
+      p1mag = Math.sqrt (pos[0] * pos[0] + pos[1] * pos[1] + pos[2] *
+         pos[2]);
+      lighttime = p1mag / C_AUDAY;
+   }
+    else
+      p1mag = lighttime * C_AUDAY;
+
+   vemag = Math.sqrt (ve[0] * ve[0] + ve[1] * ve[1] + ve[2] * ve[2]);
+   beta = vemag / C_AUDAY;
+   dot = pos[0] * ve[0] + pos[1] * ve[1] + pos[2] * ve[2];
+
+   cosd = dot / (p1mag * vemag);
+   gammai = Math.sqrt (1.0 - beta * beta);
+   p = beta * cosd;
+   q = (1.0 + p / (1.0 + gammai)) * lighttime;
+   r = 1.0 + p;
+
+   const pos2=new Array();
+   pos2[0] = (gammai * pos[0] + q * ve[0]) / r;
+   pos2[1] = (gammai * pos[1] + q * ve[1]) / r;
+   pos2[2] = (gammai * pos[2] + q * ve[2]) / r;
+
+   return pos2;
+}
+function grav_def(jd_tdb,loc_code,pos1,pos_obs){
+	//TODO:  Actually implement
+	return pos1;
+}
+
+function limb_angle (pos_obj, pos_obs)
+{
+
+   var pi, halfpi, rade;
+   var disobj, disobs, aprad, zdlim, coszd, zdobj;
+
+      pi = TWOPI / 2.0;
+      halfpi = pi / 2.0;
+      rade = ERAD / AU;
+
+/*
+   Compute the distance to the object and the distance to the observer.
+*/
+
+   disobj = Math.sqrt (pos_obj[0] * pos_obj[0] +
+                  pos_obj[1] * pos_obj[1] +
+                  pos_obj[2] * pos_obj[2]);
+
+   disobs = Math.sqrt (pos_obs[0] * pos_obs[0] +
+                  pos_obs[1] * pos_obs[1] +
+                  pos_obs[2] * pos_obs[2]);
+
+/*
+   Compute apparent angular radius of Earth's limb.
+*/
+
+   if (disobs >= rade)
+   {
+      aprad = Math.asin (rade / disobs);
+   }
+    else
+   {
+      aprad = halfpi;
+   }
+
+/*
+   Compute zenith distance of Earth's limb.
+*/
+
+   zdlim = pi - aprad;
+
+/*
+   Compute zenith distance of observed object.
+*/
+
+   coszd = (pos_obj[0] * pos_obs[0] + pos_obj[1] * pos_obs[1] +
+      pos_obj[2] * pos_obs[2]) / (disobj * disobs);
+
+   if (coszd <= -1.0)
+   {
+      zdobj = pi;
+   }
+    else if (coszd >= 1.0)
+   {
+      zdobj = 0.0;
+   }
+    else
+   {
+      zdobj = Math.acos (coszd);
+   }
+
+
+   const temp=new Array();
+/*
+   Angle of object wrt limb is difference in zenith distances.
+*/
+	temp[0]=(zdlim - zdobj) * RAD2DEG;
+   //*limb_ang = (zdlim - zdobj) * RAD2DEG;
+
+/*
+   Nadir angle of object as a fraction of angular radius of limb.
+*/
+
+	temp[1]=(pi - zdobj) / aprad;
+   //*nadir_ang = (pi - zdobj) / aprad;
+
+   return temp;
+}
+
+
+function getBodyPV(body,jd_tdb){
+	let b;
+
+	switch (body){
+		case 2: //Earth
+			b=de.getEarth(jd_tdb);
+			break;
+		case 9: //Moon
+			const e=de.getEarth(jd_tdb);
+			b=de.getAllPropertiesForSeries(body,jd_tdb);
+			for(let i=0;i<e.length;i++){
+				b[i]=b[i]+e[i];
+			}
+			break;
+		default:
+			b=de.getAllPropertiesForSeries(body,jd_tdb);
+			break;
+	}
+	for(let i=0;i<b.length;i++){
+		b[i]=b[i]/AU_KM;
+	}
+	return b;
+
 }
 
 function geo_posvel(jd_tt,delta_t,obs){
