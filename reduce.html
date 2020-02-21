@@ -40,9 +40,20 @@ const leap_secs = 33;
 const de=new DE405();
 
 const observer={'latitude': 42.0, 'longitude': -70.0, 'height': 0.0};
-reduce(observer,9);
+const radec=getTopoCentric(observer,9);
+console.log(radec);
 
-function reduce(observer,bodyNumber){
+
+const jd_utc=dateToJulianDate(year,month,day,hour,min,sec);
+const jd_tt = jd_utc + (leap_secs + 32.184) / 86400.0;
+const jd_ut1 = jd_utc + ut1_utc / 86400.0;
+const delta_t = 32.184 + leap_secs - ut1_utc;
+
+
+const zdaz=equ2hor (jd_ut1,delta_t,0.0,0.0,observer,radec[0],radec[1],0);
+console.log(zdaz);
+
+function getTopoCentric(observer,bodyNumber){
 	const jd_utc=dateToJulianDate(year,month,day,hour,min,sec);
 	const jd_tt = jd_utc + (leap_secs + 32.184) / 86400.0;
 	const jd_ut1 = jd_utc + ut1_utc / 86400.0;
@@ -88,18 +99,507 @@ function reduce(observer,bodyNumber){
 
     const pos6=frame_tie (pos5,1);
     const pos7=precession (T0,pos6,jd_tdb);
-console.log(pos7);
     const pos8=nutation (jd_tdb,0,pos7);
 
 
-console.log(pos8);
-	const ret=vector2radec(pos8);
-    ret[2]=lighttime*C_AUDAY;
+	const radec=vector2radec(pos8);
+    radec[2]=lighttime*C_AUDAY;
 
-    console.log(ret);
-    return ret;
-	//TODO: ...
+    return radec;
 }
+
+function ter2cel ( jd_ut_high,  jd_ut_low,  delta_t,
+                    method, option,  xp,  yp,  vec1,  vec2)
+{
+   var error = 0;
+   var rs, j;
+
+   var jd_ut1, jd_tt, dummy, secdiff, jd_tdb, gast, r_cio, theta;
+   
+
+ var v1=new Array();
+ var v2=new Array();
+ var v3=new Array();
+ var v4=new Array();
+ var x=new Array();
+ var y=new Array();
+ var z=new Array();
+
+/*
+   Compute the TT Julian date corresponding to the input UT1 Julian
+   date.
+*/
+
+   jd_ut1 = jd_ut_high + jd_ut_low;
+   jd_tt = jd_ut1 + (delta_t / 86400.0);
+
+/*
+   Compute the TDB Julian date corresponding to the input UT1 Julian
+   date.
+*/
+
+   jd_tdb = jd_tt;
+   secdiff=tdb2tt (jd_tdb);
+   jd_tdb = jd_tt + secdiff / 86400.0;
+   switch (method)
+   {
+      case (0):
+      	//TODO: CIO method
+         break;
+
+      case (1):
+
+/*
+   Equinox mode.
+
+   Apply polar motion.
+*/
+
+         if ((xp == 0.0) && (yp == 0.0))
+         {
+            for (j = 0; j < 3; j++)
+            {
+               v1[j] = vec1[j];
+            }
+         }
+          else
+            wobble (jd_tdb,0,xp,yp,vec1, v1);  //TODO: implement wobble
+
+/*
+   Apply Earth rotation.
+*/
+
+         gast=sidereal_time (jd_ut_high,delta_t,1,1);
+         spin (-gast * 15.0,v1, v2);
+
+/*
+   'option' = 1 skips remaining transformations.
+*/
+
+         if (option == 1)
+         {
+            vec2[0] = v2[0];
+            vec2[1] = v2[1];
+            vec2[2] = v2[2];
+         }
+          else
+         {
+
+/*
+   Apply precession, nutation, and frame tie.
+*/
+
+            //nutation (jd_tdb,-1,accuracy,v2, v3);
+            //precession (jd_tdb,v3,T0, v4);
+            //frame_tie (v4,-1, vec2);
+            v3=nutation (jd_tdb,-1,accuracy,v2);
+            v4=precession (jd_tdb,v3,T0);
+            vec2=frame_tie (v4,-1);
+         }
+         break;
+
+/*
+   Invalid value of 'method'.
+*/
+
+      default:
+         error = 2;
+         break;
+   }
+   return (error);
+}
+
+function spin (angle, pos1, pos2)
+/*
+------------------------------------------------------------------------
+
+   PURPOSE:
+      This function transforms a vector from one coordinate system
+      to another with same origin and axes rotated about the z-axis.
+
+   REFERENCES:
+      Kaplan, G. H. et. al. (1989). Astron. Journ. 97, 1197-1210.
+
+   INPUT
+   ARGUMENTS:
+      angle (double)
+         Angle of coordinate system rotation, positive counterclockwise
+         when viewed from +z, in degrees.
+      pos1[3] (double)
+         Position vector.
+
+   OUTPUT
+   ARGUMENTS:
+      pos2[3] (double)
+         Position vector expressed in new coordinate system rotated
+         about z by 'angle'.
+
+   RETURNED
+   VALUE:
+      None.
+
+   GLOBALS
+   USED:
+      DEG2RAD            novascon.c
+
+   FUNCTIONS
+   CALLED:
+      sin                math.h
+      cos                math.h
+
+   VER./DATE/
+   PROGRAMMER:
+      V1.0/08-93/WTH (USNO/AA) Translate Fortran.
+      V2.0/10-03/JAB (USNO/AA) Update for IAU 2000 resolutions.
+      V2.1/01-05/JAB (USNO/AA) Generalize the function.
+
+   NOTES:
+      1. This function is the C version of NOVAS Fortran routine 'spin'.
+
+------------------------------------------------------------------------
+*/
+{
+   var xx, yx, zx, xy, yy, zy, xz, yz, zz;
+   var angr, cosang, sinang;
+
+      angr = angle * DEG2RAD;
+      cosang = Math.cos (angr);
+      sinang = Math.sin (angr);
+
+/*
+   Rotation matrix follows.
+*/
+
+      xx =  cosang;
+      yx =  sinang;
+      zx =  0.0;
+      xy =  -sinang;
+      yy =  cosang;
+      zy =  0.0;
+      xz =  0.0;
+      yz =  0.0;
+      zz =  1.0;
+
+
+/*
+   Perform rotation.
+*/
+
+   pos2[0] = xx * pos1[0] + yx * pos1[1] + zx * pos1[2];
+   pos2[1] = xy * pos1[0] + yy * pos1[1] + zy * pos1[2];
+   pos2[2] = xz * pos1[0] + yz * pos1[1] + zz * pos1[2];
+
+   return;
+}
+
+
+function tdb2tt (tdb_jd)
+/*
+------------------------------------------------------------------------
+
+   PURPOSE:
+      Computes the Terrestrial Time (TT) or Terrestrial Dynamical Time
+      (TDT) Julian date corresponding to a Barycentric Dynamical Time
+      (TDB) Julian date.
+
+   REFERENCES:
+      Fairhead, L. & Bretagnon, P. (1990) Astron. & Astrophys. 229, 240.
+      Kaplan, G. (2005), US Naval Observatory Circular 179.
+
+   INPUT
+   ARGUMENTS:
+      tdb_jd (double)
+         TDB Julian date.
+
+   OUTPUT
+   ARGUMENTS:
+      *tt_jd (double)
+         TT Julian date.
+      *secdiff (double)
+         Difference 'tdb_jd'-'tt_jd', in seconds.
+
+   RETURNED
+   VALUE:
+      None.
+
+   GLOBALS
+   USED:
+      T0                 novascon.c
+
+   FUNCTIONS
+   CALLED:
+      sin                math.h
+
+   VER./DATE/
+   PROGRAMMER:
+      V1.0/07-92/TKB (USNO/NRL Optical Interfer.) Translate Fortran.
+      V1.1/08-93/WTH (USNO/AA) Update to C Standards.
+      V1.2/06-98/JAB (USNO/AA) Adopt new model (Explanatory Supplement
+                               to the Astronomical Almanac, pp. 42-44
+                               and p. 316.)
+      V1.3/11-03/JAB (USNO/AA) Changed variable names of the input
+                               Julian dates to make more descriptive.
+      V1.4/01-07/JAB (USNO/AA) Adopt Fairhead & Bretagnon expression.
+
+   NOTES:
+      1. Expression used in this function is a truncated form of a
+      longer and more precise series given in the first reference.  The
+      result is good to about 10 microseconds.
+      2. This function is the C version of NOVAS Fortran routine
+      'times'.
+------------------------------------------------------------------------
+*/
+{
+	var tt_jd, secdiff;
+   var t;
+
+   t = (tdb_jd - T0) / 36525.0;
+
+/*
+   Expression given in USNO Circular 179, eq. 2.6.
+*/
+
+   secdiff = 0.001657 * Math.sin ( 628.3076 * t + 6.2401)
+            + 0.000022 * Math.sin ( 575.3385 * t + 4.2970)
+            + 0.000014 * Math.sin (1256.6152 * t + 6.1969)
+            + 0.000005 * Math.sin ( 606.9777 * t + 4.0212)
+            + 0.000005 * Math.sin (  52.9691 * t + 0.4444)
+            + 0.000002 * Math.sin (  21.3299 * t + 5.5431)
+            + 0.000010 * t * Math.sin ( 628.3076 * t + 4.2490);
+
+   tt_jd = tdb_jd - secdiff / 86400.0;
+
+    return secdiff;
+}
+
+function equ2hor ( jd_ut1,  delta_t,  xp,  yp, location,  ra,  dec, ref_option)
+              //double *zd, double *az, double *rar, double *decr)
+/*
+------------------------------------------------------------------------
+
+   PURPOSE:
+      This function transforms topocentric right ascension and
+      declination to zenith distance and azimuth.  It uses a method
+      that properly accounts for polar motion, which is significant at
+      the sub-arcsecond level.  This function can also adjust
+      coordinates for atmospheric refraction.
+
+   REFERENCES:
+      Kaplan, G. (2008). USNO/AA Technical Note of 28 Apr 2008,
+         "Refraction as a Vector."
+
+   INPUT
+   ARGUMENTS:
+      jd_ut1 (double)
+         UT1 Julian date.
+      delta_t (double)
+         Difference TT-UT1 at 'jd_ut1', in seconds.
+      accuracy (short int)
+         Selection for method and accuracy
+            = 0 ... full accuracy
+            = 1 ... reduced accuracy
+      xp (double)
+         Conventionally-defined x coordinate of celestial intermediate
+         pole with respect to ITRS reference pole, in arcseconds.
+      yp (double)
+         Conventionally-defined y coordinate of celestial intermediate
+         pole with respect to ITRS reference pole, in arcseconds.
+      *location (struct on_surface)
+         Pointer to structure containing observer's location (defined
+         in novas.h).
+      ra (double)
+         Topocentric right ascension of object of interest, in hours,
+         referred to true equator and equinox of date.
+      dec (double)
+         Topocentric declination of object of interest, in degrees,
+         referred to true equator and equinox of date.
+      ref_option (short int)
+         = 0 ... no refraction
+         = 1 ... include refraction, using 'standard' atmospheric
+                 conditions.
+         = 2 ... include refraction, using atmospheric parameters
+                 input in the 'location' structure.
+
+   OUTPUT
+   ARGUMENTS:
+      *zd (double)
+         Topocentric zenith distance in degrees, affected by
+         refraction if 'ref_option' is non-zero.
+      *az (double)
+         Topocentric azimuth (measured east from north) in degrees.
+      *rar (double)
+         Topocentric right ascension of object of interest, in hours,
+         referred to true equator and equinox of date, affected by
+         refraction if 'ref_option' is non-zero.
+      *decr (double)
+         Topocentric declination of object of interest, in degrees,
+         referred to true equator and equinox of date, affected by
+         refraction if 'ref_option' is non-zero.
+
+   RETURNED
+   VALUE:
+      None.
+
+   GLOBALS
+   USED:
+      DEG2RAD, RAD2DEG   novascon.c
+
+   FUNCTIONS
+   CALLED:
+      ter2cel            novas.c
+      refract            novas.c
+      sin                math.h
+      cos                math.h
+      sqrt               math.h
+      atan2              math.h
+      fabs               math.h
+
+   VER./DATE/
+   PROGRAMMER:
+      V1.0/06-98/JAB (USNO/AA)
+      V2.0/01-06/JAB (USNO/AA)
+      V2.1/01-06/WKP (USNO/AA): Changed 'mode' to 'accuracy'.
+      V2.2/11-07/JAB (USNO/AA): Cosmetic changes.
+      V2.2/05-08/WKP (USNO/AA): Updated the refraction algorithm.
+      V2.3/06-08/WKP (USNO/AA): Tweaked convergence criteria.
+      V2.4/03-09/JAB (USNO/AA): Conformed input variables to IERS
+                                conventions.
+
+   NOTES:
+      1. 'xp' and 'yp' can be set to zero if sub-arcsecond accuracy is
+      not needed.  'ra' and 'dec' can be obtained from functions
+      'tpstar' or 'tpplan'.
+      2. The directions 'zd'= 0 (zenith) and 'az'= 0 (north) are here
+      considered fixed in the terrestrial system.  Specifically, the
+      zenith is along the geodetic normal, and north is toward
+      the ITRS pole.
+      3. If 'ref_option'= 0, then 'rar'='ra' and 'decr'='dec'.
+      4. This function is the C version of NOVAS Fortran routine
+      'zdaz'.
+
+------------------------------------------------------------------------
+*/
+{
+   var j;
+
+   var sinlat, coslat, sinlon, coslon, sindc, cosdc, sinra, cosra,
+      uze, une, uwe, uz, un, uw, p, pz, pn, pw,
+      proj, zd0, zd1, refr, sinzd, coszd, sinzd0, coszd0, pr;
+
+   //Return values:
+   var zd, az, rar, decr;
+
+	uze=new Array();
+	une=new Array();
+	uwe=new Array();
+	uz=new Array();
+	un=new Array();
+	uw=new Array();
+	p=new Array();
+	pr=new Array();
+
+/*
+   Preliminaries.
+*/
+
+   rar = ra;
+   decr = dec;
+
+   sinlat = Math.sin (location.latitude * DEG2RAD);
+   coslat = Math.cos (location.latitude * DEG2RAD);
+   sinlon = Math.sin (location.longitude * DEG2RAD);
+   coslon = Math.cos (location.longitude * DEG2RAD);
+   sindc = Math.sin (dec * DEG2RAD);
+   cosdc = Math.cos (dec * DEG2RAD);
+   sinra = Math.sin (ra * 15.0 * DEG2RAD);
+   cosra = Math.cos (ra * 15.0 * DEG2RAD);
+
+/*
+   Set up orthonormal basis vectors in local Earth-fixed system.
+
+   Define vector toward local zenith in Earth-fixed system (z axis).
+*/
+   uze[0] = coslat * coslon;
+   uze[1] = coslat * sinlon;
+   uze[2] = sinlat;
+
+/*
+   Define vector toward local north in Earth-fixed system (x axis).
+*/
+
+   une[0] = -sinlat * coslon;
+   une[1] = -sinlat * sinlon;
+   une[2] = coslat;
+
+/*
+   Define vector toward local west in Earth-fixed system (y axis).
+*/
+
+   uwe[0] = sinlon;
+   uwe[1] = -coslon;
+   uwe[2] = 0.0;
+
+/*
+   Obtain vectors in celestial system.
+
+   Rotate Earth-fixed orthonormal basis vectors to celestial system
+   (wrt equator and equinox of date).
+*/
+
+   ter2cel (jd_ut1,0.0,delta_t,1,1,xp,yp,uze, uz);
+   ter2cel (jd_ut1,0.0,delta_t,1,1,xp,yp,une, un);
+   ter2cel (jd_ut1,0.0,delta_t,1,1,xp,yp,uwe, uw);
+
+/*
+   Define unit vector 'p' toward object in celestial system
+   (wrt equator and equinox of date).
+*/
+
+   p[0] = cosdc * cosra;
+   p[1] = cosdc * sinra;
+   p[2] = sindc;
+
+/*
+   Compute coordinates of object wrt orthonormal basis.
+
+   Compute components of 'p' - projections of 'p' onto rotated
+   Earth-fixed basis vectors.
+*/
+
+   pz = p[0] * uz[0] + p[1] * uz[1] + p[2] * uz[2];
+   pn = p[0] * un[0] + p[1] * un[1] + p[2] * un[2];
+   pw = p[0] * uw[0] + p[1] * uw[1] + p[2] * uw[2];
+
+/*
+   Compute azimuth and zenith distance.
+*/
+
+   proj = Math.sqrt (pn * pn + pw * pw);
+
+   if (proj > 0.0)
+      az = -Math.atan2 (pw, pn) * RAD2DEG;
+
+   if (az < 0.0)
+      az += 360.0;
+
+   if (az >= 360.0)
+      az -= 360.0;
+
+   zd = Math.atan2 (proj, pz) * RAD2DEG;
+
+/*
+   Apply atmospheric refraction if requested.
+*/
+	//TODO: refraction
+
+	var ret=new Array();
+	ret[0]=zd;
+	ret[1]=az;
+
+	return ret;
+}
+
+
 
 function vector2radec (pos)
 {
@@ -909,6 +1409,12 @@ function sidereal_time(jd_ut,delta_t,gst_type,method){
 	const t = (jd_tdb - T0) / 36525.0;
 
 	let eqeq=0.0;
+   if (((gst_type == 0) && (method == 0)) ||       /* GMST; CIO-TIO */
+       ((gst_type == 1) && (method == 1)))         /* GAST; equinox */
+   {
+     var ee=e_tilt (jd_tdb)[2];
+      eqeq = ee * 15.0;
+   }
 
 	switch(method){
 		case 0:
