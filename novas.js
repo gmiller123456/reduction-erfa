@@ -455,31 +455,6 @@ function limb_angle (pos_obj, pos_obs)
 }
 
 
-function getBodyPV(body,jd_tdb){
-	let b;
-
-	switch (body){
-		case 2: //Earth
-			b=de.getEarth(jd_tdb);
-			break;
-		case 9: //Moon
-			const e=de.getEarth(jd_tdb);
-			b=de.getAllPropertiesForSeries(body,jd_tdb);
-			for(let i=0;i<e.length;i++){
-				b[i]=b[i]+e[i];
-			}
-			break;
-		default:
-			b=de.getAllPropertiesForSeries(body,jd_tdb);
-			break;
-	}
-	for(let i=0;i<b.length;i++){
-		b[i]=b[i]/AU_KM;
-	}
-	return b;
-
-}
-
 function geo_posvel(jd_tt,delta_t,obs){
 	const jd_tdb=tt2tdb(jd_tt);
 	const jd_ut1 = jd_tt - (delta_t / 86400.0);
@@ -489,6 +464,7 @@ function geo_posvel(jd_tt,delta_t,obs){
 	const gast=gmst+eqeq/3600.0;
 	
 	const pv1=terra(obs,gast);
+console.log(pv1);
 
    const pos2=nutation (jd_tdb,-1,pv1);
    const pos3=precession (jd_tdb,pos2,T0);
@@ -500,6 +476,7 @@ function geo_posvel(jd_tt,delta_t,obs){
    vel1[2]=pv1[5];
 
    const vel2=nutation (jd_tdb,-1,vel1);
+console.log(vel2)   ;
    const vel3=precession (jd_tdb,vel2,T0);
    const vel4=frame_tie (vel3,-1);
 
@@ -702,7 +679,8 @@ function nutation (jd_tdb, direction, pos){
     eqeq=values[2];
     psi=values[3];
     eps=values[4];
-
+console.log(psi);
+console.log(eps);
    cobm = Math.cos (oblm * DEG2RAD);
    sobm = Math.sin (oblm * DEG2RAD);
    cobt = Math.cos (oblt * DEG2RAD);

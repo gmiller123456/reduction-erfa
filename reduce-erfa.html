@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Sofa</title>
+</head>
+<body>
+<script src="sofa.src.js"></script>
+<script src="ascp2000.405.js"></script>
+<script src="de405.js"></script>
+
+<script>
+'use strict';
+
+const au= 149597870.691;
+const T0 = 2451545.00000000;
+const ASEC360 = 1296000.0;
+const ASEC2RAD = 4.848136811095359935899141e-6;
+const TWOPI=Math.PI*2;
+const DEG2RAD=Math.PI/180.0;
+const ERAD = 6378136.6;
+const F = 0.003352819697896;
+const ANGVEL = 7.2921150e-5;
+const AU_KM = 1.4959787069098932e+8;
+const C_AUDAY = 173.1446326846693;
+const AU = 1.4959787069098932e+11;
+const RAD2DEG = 57.295779513082321;
+
+const year = 2008;
+const month = 4;
+const day = 24;
+const hour = 10;
+const min = 36;
+const sec = 18;
+
+const jd_utc=IAU.dtf2d("UTC",year,month,day,hour,min,sec);
+
+//TODO: compute delta_t
+const delta_t=65.571845;
+
+
+const de=new DE405();
+
+const observer={'latitude': 42.0, 'longitude': -70.0, 'height': 0.0};
+getTopoCentric(jd_utc,observer,9)
+
+function getTopoCentric(jd_utc,observer,bodyNumber){
+	const jd_tai=IAU.utctai(jd_utc[1],jd_utc[2]);
+	const jd_tt=IAU.taitt(jd_tai[1],jd_tai[2]);
+	const jd_ut1=IAU.utcut1(jd_utc[1],jd_utc[2],-0.387845);
+
+	//TODO: compute TDB
+	const TDB_TT=0;
+	//const jd_tdb=IAU.tttdb(jd_tt[1],jd_tt[2],TDB_TT);
+	const jd_tdb=[0,2454580.942629462,0];
+
+	const earth=getBodyPV(2,jd_tdb[1]+jd_tdb[2]);
+	//const geopv=geo_posvel(jd_tt,delta_t,observer);
+	const gast=IAU.gst00a(jd_ut1[1],jd_ut1[2],jd_tt[1],jd_tt[2]);
+	const geopv=IAU.pvtob(observer.longitude*DEG2RAD,observer.latitude*DEG2RAD,0,0,0,0,gast); //meters, m/s
+
+
+}
+
+function geo_posvel(jd_tt,delta_t,obs){
+	const jd_tdb=tt2tdb(jd_tt);
+	const jd_ut1 = jd_tt[1]+jd_tt[2] - (delta_t / 86400.0);
+
+	//const gmst=sidereal_time (jd_ut1,delta_t,0,1);
+	//const eqeq=e_tilt(jd_tdb)[2];
+	//const gast=gmst+eqeq/3600.0;
+	const gast=IAU.gst00a(jd_ut1,0,jd_tt[1],jd_tt[2]);
+	
+	const pv1=terra(obs,gast/15.0*180.0/Math.PI);
+
+   const nutation=IAU.nut00a (jd_tt[1],jd_tt[2]);
+console.log(pos2[0]/ASEC2RAD)   ;
+console.log(pos2[1]/ASEC2RAD)   ;
+   const pos3=precession (jd_tdb,pos2,T0);
+   const pos4=frame_tie (pos3,-1);
+
+   const vel1=new Array();
+   vel1[0]=pv1[3];
+   vel1[1]=pv1[4];
+   vel1[2]=pv1[5];
+
+   const vel2=nutation (jd_tdb,-1,vel1);
+   const vel3=precession (jd_tdb,vel2,T0);
+   const vel4=frame_tie (vel3,-1);
+
+   const temp=new Array();
+   temp[0]=pos4[0];
+   temp[1]=pos4[1];
+   temp[2]=pos4[2];
+   temp[3]=vel4[0];
+   temp[4]=vel4[1];
+   temp[5]=vel4[2];
+
+   return temp;
+
+}
+function terra(location,st){
+   var j;
+
+   var erad_km, ht_km;
+   var df, df2, phi, sinphi, cosphi, c, s, ach, ash, stlocl, sinst, cosst;
+
+  erad_km = ERAD / 1000.0;
+
+/*
+   Compute parameters relating to geodetic to geocentric conversion.
+*/
+
+   df = 1.0 - F;
+   df2 = df * df;
+
+   phi = location.latitude * DEG2RAD;
+   sinphi = Math.sin (phi);
+   cosphi = Math.cos (phi);
+   c = 1.0 / Math.sqrt (cosphi * cosphi + df2 * sinphi * sinphi);
+   s = df2 * c;
+   ht_km = location.height / 1000.0;
+   ach = erad_km * c + ht_km;
+   ash = erad_km * s + ht_km;
+
+/*
+   Compute local sidereal time factors at the observer's longitude.
+*/
+
+   stlocl = (st * 15.0 + location.longitude) * DEG2RAD;
+   sinst = Math.sin (stlocl);
+   cosst = Math.cos (stlocl);
+
+/*
+   Compute position vector components in kilometers.
+*/
+	const pv=new Array();
+
+   pv[0] = ach * cosphi * cosst;
+   pv[1] = ach * cosphi * sinst;
+   pv[2] = ash * sinphi;
+
+/*
+   Compute velocity vector components in kilometers/sec.
+*/
+
+   pv[3] = -ANGVEL * ach * cosphi * sinst;
+   pv[4] =  ANGVEL * ach * cosphi * cosst;
+   pv[5] =  0.0;
+
+/*
+   Convert position and velocity components to AU and AU/DAY.
+*/
+
+   for (j = 0; j < 3; j++)
+   {
+      pv[j] /= AU_KM;
+      pv[j+3] /= AU_KM;
+      pv[j+3] *= 86400.0;
+   }
+
+   return pv;
+
+}
+
+//TODO: Actually implement
+function tt2tdb(tt) {
+	return tt;
+}
+
+
+function getBodyPV(body,jd_tdb){
+	let b;
+	const AU_KM = 1.4959787069098932e+8;
+
+	switch (body){
+		case 2: //Earth
+			b=de.getEarth(jd_tdb);
+			break;
+		case 9: //Moon
+			const e=de.getEarth(jd_tdb);
+			b=de.getAllPropertiesForSeries(body,jd_tdb);
+			for(let i=0;i<e.length;i++){
+				b[i]=b[i]+e[i];
+			}
+			break;
+		default:
+			b=de.getAllPropertiesForSeries(body,jd_tdb);
+			break;
+	}
+	for(let i=0;i<b.length;i++){
+		b[i]=b[i]/AU_KM;
+	}
+	return b;
+
+}
+
+
+</script>
+
+
+</body>
+</html>
