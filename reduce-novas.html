@@ -50,7 +50,6 @@ function getTopoCentric(jd_utc,observer,bodyNumber){
 	for(let i=0;i<6;i++){
 		pvb[i]=geopv[i]+earth[i];
 	}
-
 	const pv1=getBodyPV(bodyNumber,jd_tdb);
 
 	const pos2=new Array();

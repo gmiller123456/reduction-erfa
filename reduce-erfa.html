@@ -37,7 +37,6 @@ const jd_utc=IAU.dtf2d("UTC",year,month,day,hour,min,sec);
 //TODO: compute delta_t
 const delta_t=65.571845;
 
-
 const de=new DE405();
 
 const observer={'latitude': 42.0, 'longitude': -70.0, 'height': 0.0};
@@ -54,112 +53,114 @@ function getTopoCentric(jd_utc,observer,bodyNumber){
 	const jd_tdb=[0,2454580.942629462,0];
 
 	const earth=getBodyPV(2,jd_tdb[1]+jd_tdb[2]);
-	//const geopv=geo_posvel(jd_tt,delta_t,observer);
 	const gast=IAU.gst00a(jd_ut1[1],jd_ut1[2],jd_tt[1],jd_tt[2]);
 	const geopv=IAU.pvtob(observer.longitude*DEG2RAD,observer.latitude*DEG2RAD,0,0,0,0,gast); //meters, m/s
 
+	const rnpb=IAU.pnm06a(jd_tt[1], jd_tt[2]);
+	const rnpb0=IAU.tr(rnpb);
+	const geop=IAU.rxp(rnpb0,geopv[0]).map(x=>x/AU);
+	const geov=IAU.rxp(rnpb0,geopv[1]).map(x=>x/AU*60*60*24);
 
+	for(let i=0;i<3;i++){
+		geop[i]=earth[i]+geop[i];
+		geov[i]=earth[i+3]+geov[i];
+	}
+
+	const pv1=getBodyPV(bodyNumber,jd_tdb[1]+jd_tdb[2]);
+
+	const pos2=new Array();
+	const vel2=new Array();
+	for(let i=0;i<3;i++){
+		pos2[i]=pv1[i]-geop[i];
+		vel2[i]=pv1[i+3]-geov[i];
+	}
+
+   let lighttime = Math.sqrt (pos2[0] * pos2[0] + pos2[1] * pos2[1] + pos2[2] * pos2[2]) / C_AUDAY ;
+
+	let pos3=getBodyPV(bodyNumber,jd_tdb[1]+jd_tdb[2]-lighttime);
+	const vel3=new Array();
+	for(let i=0;i<3;i++){
+		pos3[i]=pos3[i]-geop[i];
+		vel3[i]=pos3[i+3]-geov[i];
+	}
+
+	//TODO: gavitational deflection
+	//const temp=limb_angle(pos3,geopv);
+	//const frlimb=temp[1];
+	//let loc=1;
+	//if (frlimb < 0.8) loc = 0;
+
+	//const pos4=grav_def (jd_tdb,loc,pos3,pvb);
+	const pos4=pos3;
+	const vel4=pos3;
+
+	//TODO: aberration
+	//const pos5=aberration (pos4,geop,geov,jd_tdb);
+	const pos5=pos4;
+
+	const pos8=IAU.rxp(rnpb,pos5);
+
+	const radec=vector2radec(pos8);
+
+	console.log(radec);
 }
 
-function geo_posvel(jd_tt,delta_t,obs){
-	const jd_tdb=tt2tdb(jd_tt);
-	const jd_ut1 = jd_tt[1]+jd_tt[2] - (delta_t / 86400.0);
+function aberration(body,observerVelocity,observerPosition,jd_tdb){
+	const bodyDist=Math.sqrt(body[0]*body[0]+body[1]*body[1]+body[2]*body[2]);
+	const bodyUnit=body.map(x=>x/bodyDist);
 
-	//const gmst=sidereal_time (jd_ut1,delta_t,0,1);
-	//const eqeq=e_tilt(jd_tdb)[2];
-	//const gast=gmst+eqeq/3600.0;
-	const gast=IAU.gst00a(jd_ut1,0,jd_tt[1],jd_tt[2]);
-	
-	const pv1=terra(obs,gast/15.0*180.0/Math.PI);
+	let sun=getBodyPV(10,jd_tdb[1]+jd_tdb[2]);
+	for(let i=0;i<3;i++){
+		sun[i]=sun[i]-observerPosition[i];
+	}
+	const sunDistance=Math.sqrt(sun[0]*sun[0]+sun[1]*sun[1]+sun[2]*sun[2]);
 
-   const nutation=IAU.nut00a (jd_tt[1],jd_tt[2]);
-console.log(pos2[0]/ASEC2RAD)   ;
-console.log(pos2[1]/ASEC2RAD)   ;
-   const pos3=precession (jd_tdb,pos2,T0);
-   const pos4=frame_tie (pos3,-1);
+	const vlen=Math.sqrt(observerVelocity[0]*observerVelocity[0]+observerVelocity[1]*observerVelocity[1]+observerVelocity[2]*observerVelocity[2]);
+	const bm1=Math.sqrt(1-vlen*vlen);
 
-   const vel1=new Array();
-   vel1[0]=pv1[3];
-   vel1[1]=pv1[4];
-   vel1[2]=pv1[5];
+console.log(vlen);
+console.log(bm1);
 
-   const vel2=nutation (jd_tdb,-1,vel1);
-   const vel3=precession (jd_tdb,vel2,T0);
-   const vel4=frame_tie (vel3,-1);
 
-   const temp=new Array();
-   temp[0]=pos4[0];
-   temp[1]=pos4[1];
-   temp[2]=pos4[2];
-   temp[3]=vel4[0];
-   temp[4]=vel4[1];
-   temp[5]=vel4[2];
-
-   return temp;
-
+	return IAU.ab(bodyUnit,observerVelocity,sunDistance,bm1);
 }
-function terra(location,st){
-   var j;
 
-   var erad_km, ht_km;
-   var df, df2, phi, sinphi, cosphi, c, s, ach, ash, stlocl, sinst, cosst;
 
-  erad_km = ERAD / 1000.0;
 
-/*
-   Compute parameters relating to geodetic to geocentric conversion.
-*/
+function vector2radec (pos)
+{
+   let xyproj;
+   let ra,dec;
 
-   df = 1.0 - F;
-   df2 = df * df;
-
-   phi = location.latitude * DEG2RAD;
-   sinphi = Math.sin (phi);
-   cosphi = Math.cos (phi);
-   c = 1.0 / Math.sqrt (cosphi * cosphi + df2 * sinphi * sinphi);
-   s = df2 * c;
-   ht_km = location.height / 1000.0;
-   ach = erad_km * c + ht_km;
-   ash = erad_km * s + ht_km;
-
-/*
-   Compute local sidereal time factors at the observer's longitude.
-*/
-
-   stlocl = (st * 15.0 + location.longitude) * DEG2RAD;
-   sinst = Math.sin (stlocl);
-   cosst = Math.cos (stlocl);
-
-/*
-   Compute position vector components in kilometers.
-*/
-	const pv=new Array();
-
-   pv[0] = ach * cosphi * cosst;
-   pv[1] = ach * cosphi * sinst;
-   pv[2] = ash * sinphi;
-
-/*
-   Compute velocity vector components in kilometers/sec.
-*/
-
-   pv[3] = -ANGVEL * ach * cosphi * sinst;
-   pv[4] =  ANGVEL * ach * cosphi * cosst;
-   pv[5] =  0.0;
-
-/*
-   Convert position and velocity components to AU and AU/DAY.
-*/
-
-   for (j = 0; j < 3; j++)
+   xyproj = Math.sqrt (pos[0] * pos[0] + pos[1] * pos[1]);
+   if ((xyproj == 0.0) && (pos[2] == 0))
    {
-      pv[j] /= AU_KM;
-      pv[j+3] /= AU_KM;
-      pv[j+3] *= 86400.0;
+      ra = 0.0;
+      dec = 0.0;
+      return 1;
+   }
+    else if (xyproj == 0.0)
+   {
+      ra = 0.0;
+      if (pos[2] < 0.0)
+         dec = -90.0;
+       else
+         dec = 90.0;
+      return 2;
+   }
+    else
+   {
+      ra = Math.atan2 (pos[1], pos[0]) / ASEC2RAD / 54000.0;
+      dec = Math.atan2 (pos[2], xyproj) / ASEC2RAD / 3600.0;
+
+      if (ra < 0.0)
+         ra += 24.0;
    }
 
-   return pv;
-
+   const temp=new Array();
+   temp[0]=ra;
+   temp[1]=dec;
+   return temp;
 }
 
 //TODO: Actually implement

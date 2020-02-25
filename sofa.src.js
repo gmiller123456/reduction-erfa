@@ -40587,8 +40587,6 @@ function iauPvtob(elong, phi, hm, xp, yp, sp, theta)
 **  Copyright (C) 2018 IAU SOFA Board.  See notes at end.
 */
 {
-console.log(phi);
-
 
    var pv = [ [0,0,0], [0,0,0] ];;
    var _rv1;

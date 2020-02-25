@@ -464,7 +464,6 @@ function geo_posvel(jd_tt,delta_t,obs){
 	const gast=gmst+eqeq/3600.0;
 	
 	const pv1=terra(obs,gast);
-console.log(pv1);
 
    const pos2=nutation (jd_tdb,-1,pv1);
    const pos3=precession (jd_tdb,pos2,T0);
@@ -476,7 +475,6 @@ console.log(pv1);
    vel1[2]=pv1[5];
 
    const vel2=nutation (jd_tdb,-1,vel1);
-console.log(vel2)   ;
    const vel3=precession (jd_tdb,vel2,T0);
    const vel4=frame_tie (vel3,-1);
 
@@ -679,8 +677,6 @@ function nutation (jd_tdb, direction, pos){
     eqeq=values[2];
     psi=values[3];
     eps=values[4];
-console.log(psi);
-console.log(eps);
    cobm = Math.cos (oblm * DEG2RAD);
    sobm = Math.sin (oblm * DEG2RAD);
    cobt = Math.cos (oblt * DEG2RAD);
