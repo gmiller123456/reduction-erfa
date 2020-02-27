@@ -9,7 +9,7 @@
 <script src="de405.js"></script>
 
 <script>
-'use strict';
+"use strict";
 
 const au= 149597870.691;
 const T0 = 2451545.00000000;
@@ -24,6 +24,7 @@ const AU_KM = 1.4959787069098932e+8;
 const C_AUDAY = 173.1446326846693;
 const AU = 1.4959787069098932e+11;
 const RAD2DEG = 57.295779513082321;
+var C = 299792458.0;
 
 const year = 2008;
 const month = 4;
@@ -92,11 +93,9 @@ function getTopoCentric(jd_utc,observer,bodyNumber){
 
 	//const pos4=grav_def (jd_tdb,loc,pos3,pvb);
 	const pos4=pos3;
-	const vel4=pos3;
 
 	//TODO: aberration
-	//const pos5=aberration (pos4,geop,geov,jd_tdb);
-	const pos5=pos4;
+	const pos5=aberration (pos4,geop,geov,jd_tdb);
 
 	const pos8=IAU.rxp(rnpb,pos5);
 
@@ -105,7 +104,7 @@ function getTopoCentric(jd_utc,observer,bodyNumber){
 	console.log(radec);
 }
 
-function aberration(body,observerVelocity,observerPosition,jd_tdb){
+function aberration(body,observerPosition,observerVelocity,jd_tdb){
 	const bodyDist=Math.sqrt(body[0]*body[0]+body[1]*body[1]+body[2]*body[2]);
 	const bodyUnit=body.map(x=>x/bodyDist);
 
@@ -114,15 +113,13 @@ function aberration(body,observerVelocity,observerPosition,jd_tdb){
 		sun[i]=sun[i]-observerPosition[i];
 	}
 	const sunDistance=Math.sqrt(sun[0]*sun[0]+sun[1]*sun[1]+sun[2]*sun[2]);
+	const vel2=observerVelocity.map(x=>x/C_AUDAY);
 
-	const vlen=Math.sqrt(observerVelocity[0]*observerVelocity[0]+observerVelocity[1]*observerVelocity[1]+observerVelocity[2]*observerVelocity[2]);
+	let vlen=Math.sqrt(observerVelocity[0]*observerVelocity[0]+observerVelocity[1]*observerVelocity[1]+observerVelocity[2]*observerVelocity[2]);
+	vlen=vlen/C_AUDAY;
 	const bm1=Math.sqrt(1-vlen*vlen);
 
-console.log(vlen);
-console.log(bm1);
-
-
-	return IAU.ab(bodyUnit,observerVelocity,sunDistance,bm1);
+	return IAU.ab(bodyUnit,vel2,sunDistance,bm1);
 }
 
 
