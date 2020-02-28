@@ -359,7 +359,7 @@ function aberration (pos, ve, lighttime)
 
    cosd = dot / (p1mag * vemag);
    gammai = Math.sqrt (1.0 - beta * beta);
-console.log(gammai);
+
    p = beta * cosd;
    q = (1.0 + p / (1.0 + gammai)) * lighttime;
    r = 1.0 + p;

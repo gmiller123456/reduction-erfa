@@ -24,7 +24,7 @@ const AU_KM = 1.4959787069098932e+8;
 const C_AUDAY = 173.1446326846693;
 const AU = 1.4959787069098932e+11;
 const RAD2DEG = 57.295779513082321;
-var C = 299792458.0;
+const C = 299792458.0;
 
 const year = 2008;
 const month = 4;
@@ -35,9 +35,6 @@ const sec = 18;
 
 const jd_utc=IAU.dtf2d("UTC",year,month,day,hour,min,sec);
 
-//TODO: compute delta_t
-const delta_t=65.571845;
-
 const de=new DE405();
 
 const observer={'latitude': 42.0, 'longitude': -70.0, 'height': 0.0};
@@ -47,11 +44,13 @@ function getTopoCentric(jd_utc,observer,bodyNumber){
 	const jd_tai=IAU.utctai(jd_utc[1],jd_utc[2]);
 	const jd_tt=IAU.taitt(jd_tai[1],jd_tai[2]);
 	const jd_ut1=IAU.utcut1(jd_utc[1],jd_utc[2],-0.387845);
+	//const jd_ut1=IAU.utcut1(jd_utc[1],jd_utc[2],0);
 
 	//TODO: compute TDB
 	const TDB_TT=0;
 	//const jd_tdb=IAU.tttdb(jd_tt[1],jd_tt[2],TDB_TT);
-	const jd_tdb=[0,2454580.942629462,0];
+	//const jd_tdb=[0,2454580.942629462,0];
+	const jd_tdb=jd_tt;
 
 	const earth=getBodyPV(2,jd_tdb[1]+jd_tdb[2]);
 	const gast=IAU.gst00a(jd_ut1[1],jd_ut1[2],jd_tt[1],jd_tt[2]);
@@ -94,7 +93,6 @@ function getTopoCentric(jd_utc,observer,bodyNumber){
 	//const pos4=grav_def (jd_tdb,loc,pos3,pvb);
 	const pos4=pos3;
 
-	//TODO: aberration
 	const pos5=aberration (pos4,geop,geov,jd_tdb);
 
 	const pos8=IAU.rxp(rnpb,pos5);
@@ -103,6 +101,164 @@ function getTopoCentric(jd_utc,observer,bodyNumber){
 
 	console.log(radec);
 }
+
+function equ2hor ( jd_ut1,  delta_t,  xp,  yp, location,  ra,  dec, ref_option)
+{
+   var j;
+
+   var sinlat, coslat, sinlon, coslon, sindc, cosdc, sinra, cosra,
+      uze, une, uwe, uz, un, uw, p, pz, pn, pw,
+      proj, zd0, zd1, refr, sinzd, coszd, sinzd0, coszd0, pr;
+
+   //Return values:
+   var zd, az, rar, decr;
+
+	uze=new Array();
+	une=new Array();
+	uwe=new Array();
+	uz=new Array();
+	un=new Array();
+	uw=new Array();
+	p=new Array();
+	pr=new Array();
+
+/*
+   Preliminaries.
+*/
+
+   rar = ra;
+   decr = dec;
+
+   sinlat = Math.sin (location.latitude * DEG2RAD);
+   coslat = Math.cos (location.latitude * DEG2RAD);
+   sinlon = Math.sin (location.longitude * DEG2RAD);
+   coslon = Math.cos (location.longitude * DEG2RAD);
+   sindc = Math.sin (dec * DEG2RAD);
+   cosdc = Math.cos (dec * DEG2RAD);
+   sinra = Math.sin (ra * 15.0 * DEG2RAD);
+   cosra = Math.cos (ra * 15.0 * DEG2RAD);
+
+/*
+   Set up orthonormal basis vectors in local Earth-fixed system.
+
+   Define vector toward local zenith in Earth-fixed system (z axis).
+*/
+   uze[0] = coslat * coslon;
+   uze[1] = coslat * sinlon;
+   uze[2] = sinlat;
+
+/*
+   Define vector toward local north in Earth-fixed system (x axis).
+*/
+
+   une[0] = -sinlat * coslon;
+   une[1] = -sinlat * sinlon;
+   une[2] = coslat;
+
+/*
+   Define vector toward local west in Earth-fixed system (y axis).
+*/
+
+   uwe[0] = sinlon;
+   uwe[1] = -coslon;
+   uwe[2] = 0.0;
+
+/*
+   Obtain vectors in celestial system.
+
+   Rotate Earth-fixed orthonormal basis vectors to celestial system
+   (wrt equator and equinox of date).
+*/
+spin (-gast * 15.0,v1, v2);
+
+   ter2cel (jd_ut1,0.0,delta_t,1,1,xp,yp,uze, uz);
+   ter2cel (jd_ut1,0.0,delta_t,1,1,xp,yp,une, un);
+   ter2cel (jd_ut1,0.0,delta_t,1,1,xp,yp,uwe, uw);
+
+/*
+   Define unit vector 'p' toward object in celestial system
+   (wrt equator and equinox of date).
+*/
+
+   p[0] = cosdc * cosra;
+   p[1] = cosdc * sinra;
+   p[2] = sindc;
+
+/*
+   Compute coordinates of object wrt orthonormal basis.
+
+   Compute components of 'p' - projections of 'p' onto rotated
+   Earth-fixed basis vectors.
+*/
+
+   pz = p[0] * uz[0] + p[1] * uz[1] + p[2] * uz[2];
+   pn = p[0] * un[0] + p[1] * un[1] + p[2] * un[2];
+   pw = p[0] * uw[0] + p[1] * uw[1] + p[2] * uw[2];
+
+/*
+   Compute azimuth and zenith distance.
+*/
+
+   proj = Math.sqrt (pn * pn + pw * pw);
+
+   if (proj > 0.0)
+      az = -Math.atan2 (pw, pn) * RAD2DEG;
+
+   if (az < 0.0)
+      az += 360.0;
+
+   if (az >= 360.0)
+      az -= 360.0;
+
+   zd = Math.atan2 (proj, pz) * RAD2DEG;
+
+/*
+   Apply atmospheric refraction if requested.
+*/
+	//TODO: refraction
+
+	var ret=new Array();
+	ret[0]=zd;
+	ret[1]=az;
+
+	return ret;
+}
+
+function spin (angle, pos1, pos2)
+{
+   var xx, yx, zx, xy, yy, zy, xz, yz, zz;
+   var angr, cosang, sinang;
+
+      angr = angle * DEG2RAD;
+      cosang = Math.cos (angr);
+      sinang = Math.sin (angr);
+
+/*
+   Rotation matrix follows.
+*/
+
+      xx =  cosang;
+      yx =  sinang;
+      zx =  0.0;
+      xy =  -sinang;
+      yy =  cosang;
+      zy =  0.0;
+      xz =  0.0;
+      yz =  0.0;
+      zz =  1.0;
+
+
+/*
+   Perform rotation.
+*/
+
+   pos2[0] = xx * pos1[0] + yx * pos1[1] + zx * pos1[2];
+   pos2[1] = xy * pos1[0] + yy * pos1[1] + zy * pos1[2];
+   pos2[2] = xz * pos1[0] + yz * pos1[1] + zz * pos1[2];
+
+   return;
+}
+
 
 function aberration(body,observerPosition,observerVelocity,jd_tdb){
 	const bodyDist=Math.sqrt(body[0]*body[0]+body[1]*body[1]+body[2]*body[2]);
@@ -121,8 +277,6 @@ function aberration(body,observerPosition,observerVelocity,jd_tdb){
 
 	return IAU.ab(bodyUnit,vel2,sunDistance,bm1);
 }
-
-
 
 function vector2radec (pos)
 {
