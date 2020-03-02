@@ -81,7 +81,7 @@ function ter2cel ( jd_ut_high,  jd_ut_low,  delta_t,
 
          gast=sidereal_time (jd_ut_high,delta_t,1,1);
          spin (-gast * 15.0,v1, v2);
-
+console.log(gast);
 /*
    'option' = 1 skips remaining transformations.
 */

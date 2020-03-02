@@ -98,11 +98,12 @@ function getTopoCentric(jd_utc,observer,bodyNumber){
 	const pos8=IAU.rxp(rnpb,pos5);
 
 	const radec=vector2radec(pos8);
-
 	console.log(radec);
+
+	console.log(equ2hor(observer,radec[0],radec[1], gast));
 }
 
-function equ2hor ( jd_ut1,  delta_t,  xp,  yp, location,  ra,  dec, ref_option)
+function equ2hor (location,  ra,  dec, gast)
 {
    var j;
 
@@ -169,11 +170,9 @@ function equ2hor ( jd_ut1,  delta_t,  xp,  yp, location,  ra,  dec, ref_option)
    Rotate Earth-fixed orthonormal basis vectors to celestial system
    (wrt equator and equinox of date).
 */
-spin (-gast * 15.0,v1, v2);
-
-   ter2cel (jd_ut1,0.0,delta_t,1,1,xp,yp,uze, uz);
-   ter2cel (jd_ut1,0.0,delta_t,1,1,xp,yp,une, un);
-   ter2cel (jd_ut1,0.0,delta_t,1,1,xp,yp,uwe, uw);
+    uz=spin (-gast * 180.0/Math.PI,uze);
+    un=spin (-gast * 180.0/Math.PI,une);
+    uw=spin (-gast * 180.0/Math.PI,uwe);
 
 /*
    Define unit vector 'p' toward object in celestial system
@@ -224,8 +223,10 @@ spin (-gast * 15.0,v1, v2);
 	return ret;
 }
 
-function spin (angle, pos1, pos2)
+
+function spin (angle, pos1)
 {
+	var pos2=new Array();
    var xx, yx, zx, xy, yy, zy, xz, yz, zz;
    var angr, cosang, sinang;
 
@@ -256,7 +257,7 @@ function spin (angle, pos1, pos2)
    pos2[1] = xy * pos1[0] + yy * pos1[1] + zy * pos1[2];
    pos2[2] = xz * pos1[0] + yz * pos1[1] + zz * pos1[2];
 
-   return;
+   return pos2;
 }
 
 
