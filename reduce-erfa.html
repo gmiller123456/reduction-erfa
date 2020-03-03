@@ -97,169 +97,15 @@ function getTopoCentric(jd_utc,observer,bodyNumber){
 
 	const pos8=IAU.rxp(rnpb,pos5);
 
-	const radec=vector2radec(pos8);
+	//const radec=vector2radec(pos8);
+	const radec=toRaDec(pos8);
 	console.log(radec);
+	console.log(radec[0]*15);
 
-	console.log(equ2hor(observer,radec[0],radec[1], gast));
+	const altaz=convertRaDecToAltAz(gast,observer.latitude*DEG2RAD,observer.longitude*DEG2RAD,radec[0]*15.0*DEG2RAD,radec[1]*DEG2RAD);
+	console.log(altaz[0]*RAD2DEG);
+	console.log(altaz[1]*RAD2DEG);
 }
-
-function equ2hor (location,  ra,  dec, gast)
-{
-   var j;
-
-   var sinlat, coslat, sinlon, coslon, sindc, cosdc, sinra, cosra,
-      uze, une, uwe, uz, un, uw, p, pz, pn, pw,
-      proj, zd0, zd1, refr, sinzd, coszd, sinzd0, coszd0, pr;
-
-   //Return values:
-   var zd, az, rar, decr;
-
-	uze=new Array();
-	une=new Array();
-	uwe=new Array();
-	uz=new Array();
-	un=new Array();
-	uw=new Array();
-	p=new Array();
-	pr=new Array();
-
-/*
-   Preliminaries.
-*/
-
-   rar = ra;
-   decr = dec;
-
-   sinlat = Math.sin (location.latitude * DEG2RAD);
-   coslat = Math.cos (location.latitude * DEG2RAD);
-   sinlon = Math.sin (location.longitude * DEG2RAD);
-   coslon = Math.cos (location.longitude * DEG2RAD);
-   sindc = Math.sin (dec * DEG2RAD);
-   cosdc = Math.cos (dec * DEG2RAD);
-   sinra = Math.sin (ra * 15.0 * DEG2RAD);
-   cosra = Math.cos (ra * 15.0 * DEG2RAD);
-
-/*
-   Set up orthonormal basis vectors in local Earth-fixed system.
-
-   Define vector toward local zenith in Earth-fixed system (z axis).
-*/
-   uze[0] = coslat * coslon;
-   uze[1] = coslat * sinlon;
-   uze[2] = sinlat;
-
-/*
-   Define vector toward local north in Earth-fixed system (x axis).
-*/
-
-   une[0] = -sinlat * coslon;
-   une[1] = -sinlat * sinlon;
-   une[2] = coslat;
-
-/*
-   Define vector toward local west in Earth-fixed system (y axis).
-*/
-
-   uwe[0] = sinlon;
-   uwe[1] = -coslon;
-   uwe[2] = 0.0;
-
-/*
-   Obtain vectors in celestial system.
-
-   Rotate Earth-fixed orthonormal basis vectors to celestial system
-   (wrt equator and equinox of date).
-*/
-    uz=spin (-gast * 180.0/Math.PI,uze);
-    un=spin (-gast * 180.0/Math.PI,une);
-    uw=spin (-gast * 180.0/Math.PI,uwe);
-
-/*
-   Define unit vector 'p' toward object in celestial system
-   (wrt equator and equinox of date).
-*/
-
-   p[0] = cosdc * cosra;
-   p[1] = cosdc * sinra;
-   p[2] = sindc;
-
-/*
-   Compute coordinates of object wrt orthonormal basis.
-
-   Compute components of 'p' - projections of 'p' onto rotated
-   Earth-fixed basis vectors.
-*/
-
-   pz = p[0] * uz[0] + p[1] * uz[1] + p[2] * uz[2];
-   pn = p[0] * un[0] + p[1] * un[1] + p[2] * un[2];
-   pw = p[0] * uw[0] + p[1] * uw[1] + p[2] * uw[2];
-
-/*
-   Compute azimuth and zenith distance.
-*/
-
-   proj = Math.sqrt (pn * pn + pw * pw);
-
-   if (proj > 0.0)
-      az = -Math.atan2 (pw, pn) * RAD2DEG;
-
-   if (az < 0.0)
-      az += 360.0;
-
-   if (az >= 360.0)
-      az -= 360.0;
-
-   zd = Math.atan2 (proj, pz) * RAD2DEG;
-
-/*
-   Apply atmospheric refraction if requested.
-*/
-	//TODO: refraction
-
-	var ret=new Array();
-	ret[0]=zd;
-	ret[1]=az;
-
-	return ret;
-}
-
-
-function spin (angle, pos1)
-{
-	var pos2=new Array();
-   var xx, yx, zx, xy, yy, zy, xz, yz, zz;
-   var angr, cosang, sinang;
-
-      angr = angle * DEG2RAD;
-      cosang = Math.cos (angr);
-      sinang = Math.sin (angr);
-
-/*
-   Rotation matrix follows.
-*/
-
-      xx =  cosang;
-      yx =  sinang;
-      zx =  0.0;
-      xy =  -sinang;
-      yy =  cosang;
-      zy =  0.0;
-      xz =  0.0;
-      yz =  0.0;
-      zz =  1.0;
-
-
-/*
-   Perform rotation.
-*/
-
-   pos2[0] = xx * pos1[0] + yx * pos1[1] + zx * pos1[2];
-   pos2[1] = xy * pos1[0] + yy * pos1[1] + zy * pos1[2];
-   pos2[2] = xz * pos1[0] + yz * pos1[1] + zz * pos1[2];
-
-   return pos2;
-}
-
 
 function aberration(body,observerPosition,observerVelocity,jd_tdb){
 	const bodyDist=Math.sqrt(body[0]*body[0]+body[1]*body[1]+body[2]*body[2]);
@@ -279,40 +125,37 @@ function aberration(body,observerPosition,observerVelocity,jd_tdb){
 	return IAU.ab(bodyUnit,vel2,sunDistance,bm1);
 }
 
-function vector2radec (pos)
-{
-   let xyproj;
-   let ra,dec;
+function toRaDec(xyz){
+	let t = new Array();
+	t[2] = Math.sqrt(xyz[0] * xyz[0] + xyz[1] * xyz[1] + xyz[2] * xyz[2]);
+	t[1] = Math.acos(xyz[2] / t[2]);
+	t[0] = Math.atan2(xyz[1], xyz[0]);
 
-   xyproj = Math.sqrt (pos[0] * pos[0] + pos[1] * pos[1]);
-   if ((xyproj == 0.0) && (pos[2] == 0))
-   {
-      ra = 0.0;
-      dec = 0.0;
-      return 1;
-   }
-    else if (xyproj == 0.0)
-   {
-      ra = 0.0;
-      if (pos[2] < 0.0)
-         dec = -90.0;
-       else
-         dec = 90.0;
-      return 2;
-   }
-    else
-   {
-      ra = Math.atan2 (pos[1], pos[0]) / ASEC2RAD / 54000.0;
-      dec = Math.atan2 (pos[2], xyproj) / ASEC2RAD / 3600.0;
+	if(t[0]<0){t[0]+=2*Math.PI;}
+	if(t[1]<0){t[1]+=2*Math.PI;}
 
-      if (ra < 0.0)
-         ra += 24.0;
-   }
+	t[1]=90-t[1]*180/Math.PI; //Return Declination in degrees
+	t[0]=t[0]*180/Math.PI/15; //Return Right Ascension in hours
 
-   const temp=new Array();
-   temp[0]=ra;
-   temp[1]=dec;
-   return temp;
+	return t;
+}
+
+function convertRaDecToAltAz(gast,lat,lon,ra,dec){
+	let h=gast + lon - ra;
+	
+	const sina=Math.sin(dec)*Math.sin(lat)+Math.cos(dec)*Math.cos(h)*Math.cos(lat);
+	const a=Math.asin(sina);
+
+	const cosAz=(Math.sin(dec)*Math.cos(lat)-Math.cos(dec)*Math.cos(h)*Math.sin(lat))/Math.cos(a);
+	let Az=Math.acos(cosAz);
+
+	if(Math.sin(h)>0){Az=2.0*Math.PI-Az;}
+
+	let t=new Array();
+	t[0]=Az;
+	t[1]=a;
+	
+	return t;
 }
 
 //TODO: Actually implement
