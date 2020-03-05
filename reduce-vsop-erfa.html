@@ -4,7 +4,7 @@
 	<title>ERFA</title>
 </head>
 <body>
-<script src="sofa.src.js"></script>
+<script src="erfa.src.js"></script>
 <script src="vsop87a_full.js"></script>
 <script src="vsop87a_full_velocities.js"></script>
 
@@ -33,15 +33,15 @@ const hour = 10;
 const min = 36;
 const sec = 18;
 
-const jd_utc=IAU.dtf2d("UTC",year,month,day,hour,min,sec);
+const jd_utc=ERFA.dtf2d("UTC",year,month,day,hour,min,sec);
 
 const observer={'latitude': 42.0, 'longitude': -70.0, 'height': 0.0};
 getTopoCentric(jd_utc,observer,9)
 
 function getTopoCentric(jd_utc,observer,bodyNumber){
-	const jd_tai=IAU.utctai(jd_utc[1],jd_utc[2]);
-	const jd_tt=IAU.taitt(jd_tai[1],jd_tai[2]);
-	const jd_ut1=IAU.utcut1(jd_utc[1],jd_utc[2],-0.387845);
+	const jd_tai=ERFA.utctai(jd_utc[1],jd_utc[2]);
+	const jd_tt=ERFA.taitt(jd_tai[1],jd_tai[2]);
+	const jd_ut1=ERFA.utcut1(jd_utc[1],jd_utc[2],-0.387845);
 	//const jd_ut1=IAU.utcut1(jd_utc[1],jd_utc[2],0);
 
 	//TODO: compute TDB
@@ -51,13 +51,13 @@ function getTopoCentric(jd_utc,observer,bodyNumber){
 	const jd_tdb=jd_tt;
 
 	const earth=getBodyPV(2,jd_tdb[1]+jd_tdb[2]);
-	const gast=IAU.gst00a(jd_ut1[1],jd_ut1[2],jd_tt[1],jd_tt[2]);
-	const geopv=IAU.pvtob(observer.longitude*DEG2RAD,observer.latitude*DEG2RAD,0,0,0,0,gast); //meters, m/s
+	const gast=ERFA.gst00a(jd_ut1[1],jd_ut1[2],jd_tt[1],jd_tt[2]);
+	const geopv=ERFA.pvtob(observer.longitude*DEG2RAD,observer.latitude*DEG2RAD,0,0,0,0,gast); //meters, m/s
 
-	const rnpb=IAU.pnm06a(jd_tt[1], jd_tt[2]);
-	const rnpb0=IAU.tr(rnpb);
-	const geop=IAU.rxp(rnpb0,geopv[0]).map(x=>x/AU);
-	const geov=IAU.rxp(rnpb0,geopv[1]).map(x=>x/AU*60*60*24);
+	const rnpb=ERFA.pnm06a(jd_tt[1], jd_tt[2]);
+	const rnpb0=ERFA.tr(rnpb);
+	const geop=ERFA.rxp(rnpb0,geopv[0]).map(x=>x/AU);
+	const geov=ERFA.rxp(rnpb0,geopv[1]).map(x=>x/AU*60*60*24);
 
 	for(let i=0;i<3;i++){
 		geop[i]=earth[i]+geop[i];
@@ -67,19 +67,15 @@ function getTopoCentric(jd_utc,observer,bodyNumber){
 	const pv1=getBodyPV(bodyNumber,jd_tdb[1]+jd_tdb[2]);
 
 	const pos2=new Array();
-	const vel2=new Array();
 	for(let i=0;i<3;i++){
 		pos2[i]=pv1[i]-geop[i];
-		vel2[i]=pv1[i+3]-geov[i];
 	}
 
    let lighttime = Math.sqrt (pos2[0] * pos2[0] + pos2[1] * pos2[1] + pos2[2] * pos2[2]) / C_AUDAY ;
 
 	let pos3=getBodyPV(bodyNumber,jd_tdb[1]+jd_tdb[2]-lighttime);
-	const vel3=new Array();
 	for(let i=0;i<3;i++){
 		pos3[i]=pos3[i]-geop[i];
-		vel3[i]=pos3[i+3]-geov[i];
 	}
 
 	//TODO: gavitational deflection
@@ -93,7 +89,7 @@ function getTopoCentric(jd_utc,observer,bodyNumber){
 
 	const pos5=aberration (pos4,geop,geov,jd_tdb);
 
-	const pos8=IAU.rxp(rnpb,pos5);
+	const pos8=ERFA.rxp(rnpb,pos5);
 
 	//const radec=vector2radec(pos8);
 	const radec=toRaDec(pos8);
@@ -101,8 +97,7 @@ function getTopoCentric(jd_utc,observer,bodyNumber){
 	console.log(radec[0]*15);
 
 	const altaz=convertRaDecToAltAz(gast,observer.latitude*DEG2RAD,observer.longitude*DEG2RAD,radec[0]*15.0*DEG2RAD,radec[1]*DEG2RAD);
-	console.log(altaz[0]*RAD2DEG);
-	console.log(altaz[1]*RAD2DEG);
+	console.log(`Az:${altaz[0]*RAD2DEG} Alt:${altaz[1]*RAD2DEG} Zd:${90-altaz[1]*RAD2DEG}`);
 }
 
 function aberration(body,observerPosition,observerVelocity,jd_tdb){
@@ -120,7 +115,7 @@ function aberration(body,observerPosition,observerVelocity,jd_tdb){
 	vlen=vlen/C_AUDAY;
 	const bm1=Math.sqrt(1-vlen*vlen);
 
-	return IAU.ab(bodyUnit,vel2,sunDistance,bm1);
+	return ERFA.ab(bodyUnit,vel2,sunDistance,bm1);
 }
 
 function toRaDec(xyz){
@@ -242,8 +237,6 @@ function getBodyPV(body,jd_tdb){
 		b[i+3]=v[i];
 	}
 
-	console.log(body);
-	console.log(b);
 	return b;
 
 }
