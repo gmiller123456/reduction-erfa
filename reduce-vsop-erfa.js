@@ -22,7 +22,6 @@ const hour = 10;
 const min = 36;
 const sec = 18;
 
-const jd_utc=ERFA.dtf2d("UTC",year,month,day,hour,min,sec);
 
 
 function getTopoCentric(jd_utc,observer,bodyNumber){

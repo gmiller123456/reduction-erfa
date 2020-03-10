@@ -23,10 +23,6 @@ console.log(astrolib.toHmsString(astrolib.getGMST(d)*15.0*Math.PI/180.0));
 console.log(astrolib.toHmsString(astrolib.getGMST(2457936.5)*15.0*Math.PI/180.0));
 */
 
-const observer={'latitude': 42.0, 'longitude': -70.0, 'height': 0.0};
-console.log(getTopoCentric(jd_utc,observer,9));
-
-
 runTests();
 
 
@@ -337,9 +333,9 @@ function monthStringToNum(m){
 	return -1;
 }
 
-function stringDateToDate(d){
+function stringDateToJD(d){
 	const year=d.substr(0,4);
-	const mon=monthStringToNum(d.substr(5,3));
+	const mon=monthStringToNum(d.substr(5,3))+1;
 	const mday=d.substr(9,2);
 	const hour=d.substr(12,2);
 	const min=d.substr(15,2);
@@ -348,51 +344,54 @@ function stringDateToDate(d){
 		sec=d.substr(18,2);
 	}
 
-	const date=new Date(Date.UTC(year,mon,mday,hour,min,sec,0));
-	return date;
+	//const date=new Date(Date.UTC(year,mon,mday,hour,min,sec,0));
+	const jd=ERFA.dtf2d("UTC",year-0,mon-0,mday-0,hour-0,min-0,sec-0);
+	if ((year<1582 || (year == 1582 && (month < 10 || (month==10 && day < 5))))){
+		jd[1]+=10;
+	}
+	return jd;
 }
 
 function jplBodyToInt(b){
 	switch(b){
-		case 10: return astrolib.SUN;
-		case 199: return astrolib.MERCURY;
-		case 299: return astrolib.VENUS;
-		case 399: return astrolib.EARTH;
-		case 499: return astrolib.MARS;
-		case 599: return astrolib.JUPITER;
-		case 699: return astrolib.SATURN;
-		case 799: return astrolib.URANUS;
-		case 899: return astrolib.NEPTUNE;
-		case 301: return astrolib.MOON;
+		case 10: return 10;
+		case 199: return 0;
+		case 299: return 1;
+		case 399: return 2;
+		case 499: return 3;
+		case 599: return 4;
+		case 699: return 5;
+		case 799: return 6;
+		case 899: return 7;
+		case 301: return 9;
 	}
 }
 
 function testPosition(body, lat, lon, date,julianDate,raJ2000,decJ2000,ra,dec,az,alt,sideRealTime,lightTime,TDB_UT,hourAngle){
-
 	//All angles passed to Astrolib need to be in radians!!!!!
-	latR=lat*Math.PI/180;
-	lonR=lon*Math.PI/180;
+	//latR=lat*Math.PI/180;
+	//lonR=lon*Math.PI/180;
+	const observer={'latitude': lat, 'longitude': lon, 'height': 0.0};
 
-	const dt=stringDateToDate(date);
+	const jd_utc=stringDateToJD(date);
 	const b=jplBodyToInt(body);
+	const result=getTopoCentric(jd_utc,observer,b);
 
-	//Convert the JavaScript date to a Julian Date
-	const jd=astrolib.convertDateToJulianDate(dt);
-
-	const deltaT=(astrolib.convertUTCtoTT(jd)-jd)*60*60*24;
-
-	const sideReal=(astrolib.getGMST(jd)+lon)/15.0;
-
-	//Get the RA/Dec.  This call accounts for light time and parallax
-	const RaDecJ2000=astrolib.getBodyRaDec(jd,b,latR,lonR,false);
-	const RaDec=astrolib.getBodyRaDec(jd,b,latR,lonR,true);
-
-	const hourAngle2=0;
+	//const RaDecJ2000=astrolib.getBodyRaDec(jd,b,latR,lonR,false);
+	//const RaDec=astrolib.getBodyRaDec(jd,b,latR,lonR,true);
 
 	//Use RA/Dec from above to compute Alt/Az
-	const AltAz=astrolib.convertRaDecToAltAz(jd,latR,lonR,RaDec[2],RaDec[1]);
+	//const AltAz=astrolib.convertRaDecToAltAz(jd,latR,lonR,RaDec[2],RaDec[1]);
+	const RaDec=[result[1],result[0]];
+	const RaDecJ2000=RaDec;
+	const AltAz=[result[2],result[3]];
+	const sideReal=0;
+	//const TDB_UT=0;
+	const deltaT=0;
+	//const hourAngle=0;
+	const hourAngle2=0;
 
-	display(b,lat,lon,date,julianDate,jd,ra,dec,alt,az,RaDec,AltAz,raJ2000,decJ2000,RaDecJ2000,sideRealTime,sideReal,TDB_UT,deltaT,hourAngle,hourAngle2);
+	display(b,lat,lon,date,julianDate,jd_utc[1]+jd_utc[2],ra,dec,alt,az,RaDec,AltAz,raJ2000,decJ2000,RaDecJ2000,sideRealTime,sideReal,TDB_UT,deltaT,hourAngle,hourAngle2);
 }
 
 function display(body,lat,lon,date,julianDate,jd,ra,dec,alt,az,RaDec,AltAz,raJ2000,decJ2000,RaDecJ2000,sideRealTime,sideReal,TDB_UT,deltaT,hourAngle, hourAngle2){
@@ -401,7 +400,7 @@ function display(body,lat,lon,date,julianDate,jd,ra,dec,alt,az,RaDec,AltAz,raJ20
 	let c=row.insertCell();
 	c.colSpan=10;
 	c.innerHTML=date+" Lat:"+lat+" Lon:"+lon;
-	row.insertCell().innerHTML=astrolib.bodies[body];
+	row.insertCell().innerHTML=body;
 
 	row=o.insertRow();
 	row.insertCell().innerHTML="Source";
@@ -433,12 +432,12 @@ function display(body,lat,lon,date,julianDate,jd,ra,dec,alt,az,RaDec,AltAz,raJ20
 	row.insertCell().innerHTML="AstroLib";
 	row.insertCell().innerHTML=jd.toFixed(7);
 	row.insertCell().innerHTML=deltaT.toFixed(7);
-	row.insertCell().innerHTML=(RaDecJ2000[2] * 180.0/Math.PI).toFixed(7);
-	row.insertCell().innerHTML=(RaDecJ2000[1] * 180.0/Math.PI).toFixed(7);
-	row.insertCell().innerHTML=(RaDec[2] * 180.0/Math.PI).toFixed(7);
-	row.insertCell().innerHTML=(RaDec[1] * 180.0/Math.PI).toFixed(7);
-	row.insertCell().innerHTML=(AltAz[1] * 180.0/Math.PI).toFixed(7);
-	row.insertCell().innerHTML=(AltAz[0] * 180.0/Math.PI).toFixed(7);
+	row.insertCell().innerHTML=(RaDecJ2000[1]).toFixed(7);
+	row.insertCell().innerHTML=(RaDecJ2000[0]).toFixed(7);
+	row.insertCell().innerHTML=(RaDec[1]).toFixed(7);
+	row.insertCell().innerHTML=(RaDec[0]).toFixed(7);
+	row.insertCell().innerHTML=(AltAz[1]).toFixed(7);
+	row.insertCell().innerHTML=(AltAz[0]).toFixed(7);
 	row.insertCell().innerHTML=sideReal.toFixed(7);
 	row.insertCell().innerHTML=hourAngle2.toFixed(7);
 
@@ -446,12 +445,12 @@ function display(body,lat,lon,date,julianDate,jd,ra,dec,alt,az,RaDec,AltAz,raJ20
 	row.insertCell().innerHTML="Diff";
 	row.insertCell().innerHTML=Math.abs(jd-julianDate).toFixed(7);
 	row.insertCell().innerHTML=Math.abs(TDB_UT-deltaT).toFixed(7);
-	row.insertCell().innerHTML=Math.abs(raJ2000 - RaDecJ2000[2] * 180.0/Math.PI).toFixed(7);
-	row.insertCell().innerHTML=Math.abs(decJ2000 - RaDecJ2000[1] * 180.0/Math.PI).toFixed(7);
-	row.insertCell().innerHTML=Math.abs(ra - RaDec[2] * 180.0/Math.PI).toFixed(7);
-	row.insertCell().innerHTML=Math.abs(dec - RaDec[1] * 180.0/Math.PI).toFixed(7);
-	row.insertCell().innerHTML=Math.abs(alt - AltAz[1] * 180.0/Math.PI).toFixed(7);
-	row.insertCell().innerHTML=Math.abs(az - AltAz[0] * 180.0/Math.PI).toFixed(7);
+	row.insertCell().innerHTML=Math.abs(raJ2000 - RaDecJ2000[1]).toFixed(7);
+	row.insertCell().innerHTML=Math.abs(decJ2000 - RaDecJ2000[0]).toFixed(7);
+	row.insertCell().innerHTML=Math.abs(ra - RaDec[1]).toFixed(7);
+	row.insertCell().innerHTML=Math.abs(dec - RaDec[0]).toFixed(7);
+	row.insertCell().innerHTML=Math.abs(alt - AltAz[1]).toFixed(7);
+	row.insertCell().innerHTML=Math.abs(az - AltAz[0]).toFixed(7);
 	row.insertCell().innerHTML=Math.abs(sideRealTime-sideReal).toFixed(7);
 	row.insertCell().innerHTML=Math.abs(hourAngle-hourAngle2).toFixed(7);
 
