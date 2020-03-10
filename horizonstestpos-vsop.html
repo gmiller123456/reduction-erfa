@@ -16,6 +16,8 @@
 
 
 <script>
+'use strict';
+
 
 /*
 const d=astrolib.convertDateToJulianDate(new Date(Date.UTC(2020,3,11,16,0,0,0)));
@@ -333,23 +335,46 @@ function monthStringToNum(m){
 	return -1;
 }
 
+
+//Special "Math.floor()" function used by convertDateToJulianDate()
+function INT(d){
+	if(d>0){
+		return Math.floor(d);
+	}
+	return Math.floor(d)-1;
+}
+
+
 function stringDateToJD(d){
-	const year=d.substr(0,4);
-	const mon=monthStringToNum(d.substr(5,3))+1;
-	const mday=d.substr(9,2);
-	const hour=d.substr(12,2);
-	const min=d.substr(15,2);
-	let sec="00";
+	let  year=d.substr(0,4)-0;
+	let  month=monthStringToNum(d.substr(5,3))+1;
+	const day=d.substr(9,2)-0;
+	const hour=d.substr(12,2)-0;
+	const min=d.substr(15,2)-0;
+	let sec=0;
+
 	if(d.length>18){
-		sec=d.substr(18,2);
+		sec=d.substr(18,2)-0;
 	}
 
-	//const date=new Date(Date.UTC(year,mon,mday,hour,min,sec,0));
-	const jd=ERFA.dtf2d("UTC",year-0,mon-0,mday-0,hour-0,min-0,sec-0);
-	if ((year<1582 || (year == 1582 && (month < 10 || (month==10 && day < 5))))){
-		jd[1]+=10;
+	if (month < 3){
+		year = year - 1;
+		month = month + 12;
 	}
-	return jd;
+
+	let b = 0;
+	if (!(year<1582 || (year == 1582 && (month < 10 || (month==10 && day < 5))))){
+		let a = INT(year / 100.0);
+		b = 2 - a + INT(a / 4.0);
+	}
+
+	let jd=INT(365.25 * (year + 4716)) + INT(30.6001 * (month + 1)) + day + b - 1524.5;
+
+	let frac=0;
+	frac+=hour/24.0;
+	frac+=min/24.0/60.0;
+	frac+=sec/24.0/60.0/60.0;
+	return [1,jd,frac];
 }
 
 function jplBodyToInt(b){
@@ -382,7 +407,7 @@ function testPosition(body, lat, lon, date,julianDate,raJ2000,decJ2000,ra,dec,az
 
 	//Use RA/Dec from above to compute Alt/Az
 	//const AltAz=astrolib.convertRaDecToAltAz(jd,latR,lonR,RaDec[2],RaDec[1]);
-	const RaDec=[result[1],result[0]];
+	const RaDec=[result[1],result[0]*15];
 	const RaDecJ2000=RaDec;
 	const AltAz=[result[2],result[3]];
 	const sideReal=0;
@@ -443,20 +468,29 @@ function display(body,lat,lon,date,julianDate,jd,ra,dec,alt,az,RaDec,AltAz,raJ20
 
 	row=o.insertRow();
 	row.insertCell().innerHTML="Diff";
-	row.insertCell().innerHTML=Math.abs(jd-julianDate).toFixed(7);
-	row.insertCell().innerHTML=Math.abs(TDB_UT-deltaT).toFixed(7);
-	row.insertCell().innerHTML=Math.abs(raJ2000 - RaDecJ2000[1]).toFixed(7);
-	row.insertCell().innerHTML=Math.abs(decJ2000 - RaDecJ2000[0]).toFixed(7);
-	row.insertCell().innerHTML=Math.abs(ra - RaDec[1]).toFixed(7);
-	row.insertCell().innerHTML=Math.abs(dec - RaDec[0]).toFixed(7);
-	row.insertCell().innerHTML=Math.abs(alt - AltAz[1]).toFixed(7);
-	row.insertCell().innerHTML=Math.abs(az - AltAz[0]).toFixed(7);
-	row.insertCell().innerHTML=Math.abs(sideRealTime-sideReal).toFixed(7);
-	row.insertCell().innerHTML=Math.abs(hourAngle-hourAngle2).toFixed(7);
+	addDiffCol(row,jd,julianDate);
+	addDiffCol(row,TDB_UT,deltaT);
+	addDiffCol(row,raJ2000,RaDecJ2000[1]);
+	addDiffCol(row,decJ2000,RaDecJ2000[0]);
+	addDiffCol(row,ra,RaDec[1]);
+	addDiffCol(row,dec,RaDec[0]);
+	addDiffCol(row,alt,AltAz[1]);
+	addDiffCol(row,az,AltAz[0]);
+	addDiffCol(row,sideRealTime,sideReal);
+	addDiffCol(row,hourAngle,hourAngle2);
 
 	row=o.insertRow();
 	c=row.insertCell();
 	c.innerHTML="&nbsp;";
 	c.colSpan=11;
+}
+
+function addDiffCol(row,v1,v2){
+	const c=row.insertCell();
+	const diff=Math.abs(v1-v2).toFixed(7);
+	c.innerHTML=diff;
+	if(diff>.002){
+		c.style.backgroundColor="red";
+	}
 }
 </script></body></html>

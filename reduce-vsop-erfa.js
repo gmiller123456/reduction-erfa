@@ -15,15 +15,6 @@ const AU = 1.4959787069098932e+11;
 const RAD2DEG = 57.295779513082321;
 const C = 299792458.0;
 
-const year = 2008;
-const month = 4;
-const day = 24;
-const hour = 10;
-const min = 36;
-const sec = 18;
-
-
-
 function getTopoCentric(jd_utc,observer,bodyNumber){
 	const jd_tai=ERFA.utctai(jd_utc[1],jd_utc[2]);
 	const jd_tt=ERFA.taitt(jd_tai[1],jd_tai[2]);
