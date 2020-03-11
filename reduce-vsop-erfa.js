@@ -18,7 +18,7 @@ const C = 299792458.0;
 function getTopoCentric(jd_utc,observer,bodyNumber){
 	const jd_tai=ERFA.utctai(jd_utc[1],jd_utc[2]);
 	const jd_tt=ERFA.taitt(jd_tai[1],jd_tai[2]);
-	const jd_ut1=ERFA.utcut1(jd_utc[1],jd_utc[2],-0.387845);
+	const jd_ut1=ERFA.utcut1(jd_utc[1],jd_utc[2],0.0);
 	//const jd_ut1=IAU.utcut1(jd_utc[1],jd_utc[2],0);
 
 	//TODO: compute TDB
@@ -66,6 +66,7 @@ function getTopoCentric(jd_utc,observer,bodyNumber){
 
 	const pos5=aberration (pos4,geop,geov,jd_tdb);
 
+	const j2000=toRaDec(pos3);
 	const pos8=ERFA.rxp(rnpb,pos5);
 
 	//const radec=vector2radec(pos8);
@@ -76,7 +77,7 @@ function getTopoCentric(jd_utc,observer,bodyNumber){
 	const altaz=convertRaDecToAltAz(gast,observer.latitude*DEG2RAD,observer.longitude*DEG2RAD,radec[0]*15.0*DEG2RAD,radec[1]*DEG2RAD);
 	//console.log(`Az:${altaz[0]*RAD2DEG} Alt:${altaz[1]*RAD2DEG} Zd:${90-altaz[1]*RAD2DEG}`);
 
-	return [radec[0],radec[1],altaz[0]*RAD2DEG,altaz[1]*RAD2DEG];
+	return [radec[0],radec[1],altaz[0]*RAD2DEG,altaz[1]*RAD2DEG,j2000[0],j2000[1],gast,jd_tt[1]+jd_tt[2]-jd_utc[1]-jd_utc[2]];
 }
 
 function aberration(body,observerPosition,observerVelocity,jd_tdb){

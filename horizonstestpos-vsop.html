@@ -18,6 +18,7 @@
 <script>
 'use strict';
 
+const bodies=["Mercury","Venus","Earth","Mars","Jupiter","Saturn","Uranus","Neptune","","Moon","Sun"];
 
 /*
 const d=astrolib.convertDateToJulianDate(new Date(Date.UTC(2020,3,11,16,0,0,0)));
@@ -31,14 +32,6 @@ runTests();
 function runTests(){
 	//Test data generated from NASA's JPL Horizons system.
 	//         planet,   lat,            lon,              date,                    jul day,       RA J2000,   DEC J2000, RA of Date,   Dec of date, Azi,     Alt,      Sidereal Time, Light Time,   TDB-UT,      Hour angle
-	testPosition(199,-45.0396581387729,52.6267552330626,"1527-Oct-21 22:24:53", 2279088.433946759,204.3614898, -7.8488443, 198.2076359, -5.3974508, 124.4669,-22.8271,  4.5307070225,   7.751917,   174.433345,  -8.683135370);
-	testPosition(10,-75.6965454927354,163.712986244958,"1125-Jun-14 01:12:44", 2132128.550509259,101.6429994, 23.1221215,  88.3563845, 23.5451200, 358.1011, -9.2500,  6.0267231267,   8.458209,  1094.474313,   0.136297493);
-	testPosition(10,26.7967632675912,217.814997034872,"1111-Oct-25 15:55:01", 2127148.163206019,228.0588903,-17.9715040, 215.7391762,-14.2874437, 107.4392,  2.5997,  9.0780394226,   8.223219,  1133.585393,  -5.304572322);
-	testPosition(10,-71.5030354802627,322.670493082992,"1063-Mar-19 18:38:43", 2109396.276886574, 16.1408604,  6.9214724,   4.0935808,  1.7854219, 298.4607,  7.1989,  4.3240156388,   8.332709,  1289.454952,   4.051110250);
-	testPosition(10,77.2069702520977,118.639627806683,"1472-Aug-18 16:47:23", 2258936.199571759,163.2048884,  7.1568736, 156.3041080,  9.9129372,  10.1558, -2.6785, 23.1069400896,   8.383890,   241.881103, -11.313333776);
-	testPosition(499,81.9121742352522,248.896246076003,"1955-Aug-26 17:03:14", 2435346.210578704,152.6589871, 12.4817319, 152.0646154, 12.7006088, 145.5122, 19.4223,  7.9250404113,  22.224508,    30.612439,  -2.212600613);
-	testPosition(599,68.4688217628369,60.2632226629549,"1658-Jul-25 05:53:38", 2326837.745578703,121.6124830, 20.6193895, 116.6004466, 21.5438150, 149.0091, 40.6459,  6.1176176006,  52.068447,    36.526055,  -1.655745503);
-
 	testPosition(10,40.5685793309708,179.240599988614,"2633-Apr-22 05:33:46", 2682854.731782407, 21.5877673,  9.0180628,  29.9967331, 12.1818592, 274.8692, 13.1751,  7.5320745447,   8.334292,    69.185614,   5.532292336);
 	testPosition(799,-89.163023764716,66.9975288348826,"2491-Sep-06 15:58:33", 2631128.165659722,262.3758482,-23.4105260, 269.8757219,-23.5979494, 336.9535, 24.3685, 19.5184614332, 157.283276,    69.182658,   1.526746639);
 	testPosition(799,-86.173169090456,61.5160879461091,"2335-Sep-07 21:11:15", 2574150.382812500,316.6101683,-17.3212270, 321.2821694,-15.9125458, 314.9858, 18.6381,  0.3640299479, 158.027539,    69.182637,   2.945218653);
@@ -393,30 +386,26 @@ function jplBodyToInt(b){
 }
 
 function testPosition(body, lat, lon, date,julianDate,raJ2000,decJ2000,ra,dec,az,alt,sideRealTime,lightTime,TDB_UT,hourAngle){
-	//All angles passed to Astrolib need to be in radians!!!!!
-	//latR=lat*Math.PI/180;
-	//lonR=lon*Math.PI/180;
+	
 	const observer={'latitude': lat, 'longitude': lon, 'height': 0.0};
 
 	const jd_utc=stringDateToJD(date);
+//if(Math.abs(jd_utc[1]-2451545.0)>2000) return;
 	const b=jplBodyToInt(body);
 	const result=getTopoCentric(jd_utc,observer,b);
 
-	//const RaDecJ2000=astrolib.getBodyRaDec(jd,b,latR,lonR,false);
-	//const RaDec=astrolib.getBodyRaDec(jd,b,latR,lonR,true);
-
-	//Use RA/Dec from above to compute Alt/Az
-	//const AltAz=astrolib.convertRaDecToAltAz(jd,latR,lonR,RaDec[2],RaDec[1]);
-	const RaDec=[result[1],result[0]*15];
-	const RaDecJ2000=RaDec;
+	const RaDec=[result[1],result[0]];
+	const RaDecJ2000=[result[5],result[4]];
 	const AltAz=[result[2],result[3]];
-	const sideReal=0;
-	//const TDB_UT=0;
-	const deltaT=0;
-	//const hourAngle=0;
-	const hourAngle2=0;
+	let sideReal=(result[6]*(180.0/Math.PI)+lon)/15.0;
+	while(sideReal<0) sideReal+=24.0;
+	while(sideReal>24) sideReal-=24.0;
+	const deltaT=result[7]*86000;
+	let hourAngle2=(sideReal-RaDec[1]);
+	if(hourAngle2<-12) hourAngle2+=24.0;
+	if(hourAngle2>12) hourAngle2-=24.0;
 
-	display(b,lat,lon,date,julianDate,jd_utc[1]+jd_utc[2],ra,dec,alt,az,RaDec,AltAz,raJ2000,decJ2000,RaDecJ2000,sideRealTime,sideReal,TDB_UT,deltaT,hourAngle,hourAngle2);
+	display(b,lat,lon,date,julianDate,jd_utc[1]+jd_utc[2],ra/15.0,dec,alt,az,RaDec,AltAz,raJ2000/15.0,decJ2000,RaDecJ2000,sideRealTime,sideReal,TDB_UT,deltaT,hourAngle,hourAngle2);
 }
 
 function display(body,lat,lon,date,julianDate,jd,ra,dec,alt,az,RaDec,AltAz,raJ2000,decJ2000,RaDecJ2000,sideRealTime,sideReal,TDB_UT,deltaT,hourAngle, hourAngle2){
@@ -425,7 +414,7 @@ function display(body,lat,lon,date,julianDate,jd,ra,dec,alt,az,RaDec,AltAz,raJ20
 	let c=row.insertCell();
 	c.colSpan=10;
 	c.innerHTML=date+" Lat:"+lat+" Lon:"+lon;
-	row.insertCell().innerHTML=body;
+	row.insertCell().innerHTML=bodies[body];
 
 	row=o.insertRow();
 	row.insertCell().innerHTML="Source";
@@ -489,7 +478,7 @@ function addDiffCol(row,v1,v2){
 	const c=row.insertCell();
 	const diff=Math.abs(v1-v2).toFixed(7);
 	c.innerHTML=diff;
-	if(diff>.002){
+	if(diff>1.0/60.0/60.0){
 		c.style.backgroundColor="red";
 	}
 }
