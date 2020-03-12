@@ -146,55 +146,6 @@ var ERFA_LEAPSEC = [
 var ERFA_IYV = 2019;
 
 function eraAb(pnat, v, s, bm1)
-/*
-**  - - - - - -
-**   e r a A b
-**  - - - - - -
-**
-**  Apply aberration to transform natural direction into proper
-**  direction.
-**
-**  Given:
-**    pnat    double[3]   natural direction to the source (unit vector)
-**    v       double[3]   observer barycentric velocity in units of c
-**    s       double      distance between the Sun and the observer (au)
-**    bm1     double      sqrt(1-|v|^2): reciprocal of Lorenz factor
-**
-**  Returned:
-**    ppr     double[3]   proper direction to source (unit vector)
-**
-**  Notes:
-**
-**  1) The algorithm is based on Expr. (7.40) in the Explanatory
-**     Supplement (Urban & Seidelmann 2013), but with the following
-**     changes:
-**
-**     o  Rigorous rather than approximate normalization is applied.
-**
-**     o  The gravitational potential term from Expr. (7) in
-**        Klioner (2003) is added, taking into account only the Sun's
-**        contribution.  This has a maximum effect of about
-**        0.4 microarcsecond.
-**
-**  2) In almost all cases, the maximum accuracy will be limited by the
-**     supplied velocity.  For example, if the ERFA eraEpv00 function is
-**     used, errors of up to 5 microarcseconds could occur.
-**
-**  References:
-**
-**     Urban, S. & Seidelmann, P. K. (eds), Explanatory Supplement to
-**     the Astronomical Almanac, 3rd ed., University Science Books
-**     (2013).
-**
-**     Klioner, Sergei A., "A practical relativistic model for micro-
-**     arcsecond astrometry in space", Astr. J. 125, 1580-1597 (2003).
-**
-**  Called:
-**     eraPdp       scalar product of two p-vectors
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var ppr = [0, 0, 0];;
 
@@ -222,22 +173,6 @@ function eraAb(pnat, v, s, bm1)
 return ppr;
 };
 function eraAnp(a)
-/*
-**  - - - - - - -
-**   e r a A n p
-**  - - - - - - -
-**
-**  Normalize angle into the range 0 <= a < 2pi.
-**
-**  Given:
-**     a        double     angle (radians)
-**
-**  Returned (function value):
-**              double     angle in range 0-2pi
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var w;
 
@@ -248,126 +183,8 @@ function eraAnp(a)
    return w;
 
 }
-/*
- *+----------------------------------------------------------------------
- *
- *  ERFA/SOFA functions converted to JS
- *  Copyright (C) 2020 by Marcel Greter
- *  http:://www.github.com/mgreter/sofa.js
- *
- *  The conversion is done by a custom hacked perl script.
- *  Automatically generates QUnit tests for all functions.
- *
- *  Conversion is made from liberfa sources:
- *  https://github.com/liberfa/erfa
- *
- *+----------------------------------------------------------------------
- *  THIS WORK IS RELEASED UNDER THE SAME TERMS AS ERFA:
- *+----------------------------------------------------------------------
- *
- *  Copyright (C) 2013-2014, NumFOCUS Foundation.
- *  All rights reserved.
- *  
- *  This library is derived, with permission, from the International
- *  Astronomical Union's "Standards of Fundamental Astronomy" library,
- *  available from http://www.iausofa.org.
- *  
- *  The ERFA version is intended to retain identical
- *  functionality to the SOFA library, but made distinct through
- *  different function and file names, as set out in the SOFA license
- *  conditions. The SOFA original has a role as a reference standard
- *  for the IAU and IERS, and consequently redistribution is permitted only
- *  in its unaltered state. The ERFA version is not subject to this
- *  restriction and therefore can be included in distributions which do not
- *  support the concept of "read only" software.
- *  
- *  Although the intent is to replicate the SOFA API (other than replacement of
- *  prefix names) and results (with the exception of bugs; any that are
- *  discovered will be fixed), SOFA is not responsible for any errors found
- *  in this version of the library.
- *  
- *  If you wish to acknowledge the SOFA heritage, please acknowledge that
- *  you are using a library derived from SOFA, rather than SOFA itself.
- *  
- *  
- *  TERMS AND CONDITIONS
- *  
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions are met:
- *  
- *  1 Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  
- *  2 Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  
- *  3 Neither the name of the Standards Of Fundamental Astronomy Board, the
- *     International Astronomical Union nor the names of its contributors
- *     may be used to endorse or promote products derived from this software
- *     without specific prior written permission.
- *  
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
- *  IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- *  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- *  PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- *  HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- *  TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- *  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- *  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *-----------------------------------------------------------------------
-*/
 ;
 function eraCal2jd(iy, im, id)
-/*
-**  - - - - - - - - - -
-**   e r a C a l 2 j d
-**  - - - - - - - - - -
-**
-**  Gregorian Calendar to Julian Date.
-**
-**  Given:
-**     iy,im,id  int     year, month, day in Gregorian calendar (Note 1)
-**
-**  Returned:
-**     djm0      double  MJD zero-point: always 2400000.5
-**     djm       double  Modified Julian Date for 0 hrs
-**
-**  Returned (function value):
-**               int     status:
-**                           0 = OK
-**                          -1 = bad year   (Note 3: JD not computed)
-**                          -2 = bad month  (JD not computed)
-**                          -3 = bad day    (JD computed)
-**
-**  Notes:
-**
-**  1) The algorithm used is valid from -4800 March 1, but this
-**     implementation rejects dates before -4799 January 1.
-**
-**  2) The Julian Date is returned in two pieces, in the usual ERFA
-**     manner, which is designed to preserve time resolution.  The
-**     Julian Date is available as a single number by adding djm0 and
-**     djm.
-**
-**  3) In early eras the conversion is from the "Proleptic Gregorian
-**     Calendar";  no account is taken of the date(s) of adoption of
-**     the Gregorian Calendar, nor is the AD/BC numbering convention
-**     observed.
-**
-**  Reference:
-**
-**     Explanatory Supplement to the Astronomical Almanac,
-**     P. Kenneth Seidelmann (ed), University Science Books (1992),
-**     Section 12.92 (p604).
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var djm0 = 0.0;;
    var djm = 0.0;;
@@ -409,97 +226,8 @@ function eraCal2jd(iy, im, id)
    return [ j, djm0, djm ];
 
 }
-/*
- *+----------------------------------------------------------------------
- *
- *  ERFA/SOFA functions converted to JS
- *  Copyright (C) 2020 by Marcel Greter
- *  http:://www.github.com/mgreter/sofa.js
- *
- *  The conversion is done by a custom hacked perl script.
- *  Automatically generates QUnit tests for all functions.
- *
- *  Conversion is made from liberfa sources:
- *  https://github.com/liberfa/erfa
- *
- *+----------------------------------------------------------------------
- *  THIS WORK IS RELEASED UNDER THE SAME TERMS AS ERFA:
- *+----------------------------------------------------------------------
- *
- *  Copyright (C) 2013-2014, NumFOCUS Foundation.
- *  All rights reserved.
- *  
- *  This library is derived, with permission, from the International
- *  Astronomical Union's "Standards of Fundamental Astronomy" library,
- *  available from http://www.iausofa.org.
- *  
- *  The ERFA version is intended to retain identical
- *  functionality to the SOFA library, but made distinct through
- *  different function and file names, as set out in the SOFA license
- *  conditions. The SOFA original has a role as a reference standard
- *  for the IAU and IERS, and consequently redistribution is permitted only
- *  in its unaltered state. The ERFA version is not subject to this
- *  restriction and therefore can be included in distributions which do not
- *  support the concept of "read only" software.
- *  
- *  Although the intent is to replicate the SOFA API (other than replacement of
- *  prefix names) and results (with the exception of bugs; any that are
- *  discovered will be fixed), SOFA is not responsible for any errors found
- *  in this version of the library.
- *  
- *  If you wish to acknowledge the SOFA heritage, please acknowledge that
- *  you are using a library derived from SOFA, rather than SOFA itself.
- *  
- *  
- *  TERMS AND CONDITIONS
- *  
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions are met:
- *  
- *  1 Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  
- *  2 Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  
- *  3 Neither the name of the Standards Of Fundamental Astronomy Board, the
- *     International Astronomical Union nor the names of its contributors
- *     may be used to endorse or promote products derived from this software
- *     without specific prior written permission.
- *  
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
- *  IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- *  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- *  PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- *  HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- *  TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- *  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- *  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *-----------------------------------------------------------------------
-*/
 ;
 function eraCp(p)
-/*
-**  - - - - - -
-**   e r a C p
-**  - - - - - -
-**
-**  Copy a p-vector.
-**
-**  Given:
-**     p        double[3]     p-vector to be copied
-**
-**  Returned:
-**     c        double[3]     copy
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var c = [0, 0, 0];;
 
@@ -511,100 +239,8 @@ function eraCp(p)
    return c;
 
 }
-/*
- *+----------------------------------------------------------------------
- *
- *  ERFA/SOFA functions converted to JS
- *  Copyright (C) 2020 by Marcel Greter
- *  http:://www.github.com/mgreter/sofa.js
- *
- *  The conversion is done by a custom hacked perl script.
- *  Automatically generates QUnit tests for all functions.
- *
- *  Conversion is made from liberfa sources:
- *  https://github.com/liberfa/erfa
- *
- *+----------------------------------------------------------------------
- *  THIS WORK IS RELEASED UNDER THE SAME TERMS AS ERFA:
- *+----------------------------------------------------------------------
- *
- *  Copyright (C) 2013-2014, NumFOCUS Foundation.
- *  All rights reserved.
- *  
- *  This library is derived, with permission, from the International
- *  Astronomical Union's "Standards of Fundamental Astronomy" library,
- *  available from http://www.iausofa.org.
- *  
- *  The ERFA version is intended to retain identical
- *  functionality to the SOFA library, but made distinct through
- *  different function and file names, as set out in the SOFA license
- *  conditions. The SOFA original has a role as a reference standard
- *  for the IAU and IERS, and consequently redistribution is permitted only
- *  in its unaltered state. The ERFA version is not subject to this
- *  restriction and therefore can be included in distributions which do not
- *  support the concept of "read only" software.
- *  
- *  Although the intent is to replicate the SOFA API (other than replacement of
- *  prefix names) and results (with the exception of bugs; any that are
- *  discovered will be fixed), SOFA is not responsible for any errors found
- *  in this version of the library.
- *  
- *  If you wish to acknowledge the SOFA heritage, please acknowledge that
- *  you are using a library derived from SOFA, rather than SOFA itself.
- *  
- *  
- *  TERMS AND CONDITIONS
- *  
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions are met:
- *  
- *  1 Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  
- *  2 Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  
- *  3 Neither the name of the Standards Of Fundamental Astronomy Board, the
- *     International Astronomical Union nor the names of its contributors
- *     may be used to endorse or promote products derived from this software
- *     without specific prior written permission.
- *  
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
- *  IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- *  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- *  PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- *  HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- *  TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- *  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- *  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *-----------------------------------------------------------------------
-*/
 ;
 function eraCr(r)
-/*
-**  - - - - - -
-**   e r a C r
-**  - - - - - -
-**
-**  Copy an r-matrix.
-**
-**  Given:
-**     r        double[3][3]    r-matrix to be copied
-**
-**  Returned:
-**     c        double[3][3]    copy
-**
-**  Called:
-**     eraCp        copy p-vector
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var c = [ [0,0,0], [0,0,0], [0,0,0] ];;
    if (typeof c == 'undefined') {
@@ -618,198 +254,8 @@ function eraCr(r)
    return c;
 
 }
-/*
- *+----------------------------------------------------------------------
- *
- *  ERFA/SOFA functions converted to JS
- *  Copyright (C) 2020 by Marcel Greter
- *  http:://www.github.com/mgreter/sofa.js
- *
- *  The conversion is done by a custom hacked perl script.
- *  Automatically generates QUnit tests for all functions.
- *
- *  Conversion is made from liberfa sources:
- *  https://github.com/liberfa/erfa
- *
- *+----------------------------------------------------------------------
- *  THIS WORK IS RELEASED UNDER THE SAME TERMS AS ERFA:
- *+----------------------------------------------------------------------
- *
- *  Copyright (C) 2013-2014, NumFOCUS Foundation.
- *  All rights reserved.
- *  
- *  This library is derived, with permission, from the International
- *  Astronomical Union's "Standards of Fundamental Astronomy" library,
- *  available from http://www.iausofa.org.
- *  
- *  The ERFA version is intended to retain identical
- *  functionality to the SOFA library, but made distinct through
- *  different function and file names, as set out in the SOFA license
- *  conditions. The SOFA original has a role as a reference standard
- *  for the IAU and IERS, and consequently redistribution is permitted only
- *  in its unaltered state. The ERFA version is not subject to this
- *  restriction and therefore can be included in distributions which do not
- *  support the concept of "read only" software.
- *  
- *  Although the intent is to replicate the SOFA API (other than replacement of
- *  prefix names) and results (with the exception of bugs; any that are
- *  discovered will be fixed), SOFA is not responsible for any errors found
- *  in this version of the library.
- *  
- *  If you wish to acknowledge the SOFA heritage, please acknowledge that
- *  you are using a library derived from SOFA, rather than SOFA itself.
- *  
- *  
- *  TERMS AND CONDITIONS
- *  
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions are met:
- *  
- *  1 Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  
- *  2 Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  
- *  3 Neither the name of the Standards Of Fundamental Astronomy Board, the
- *     International Astronomical Union nor the names of its contributors
- *     may be used to endorse or promote products derived from this software
- *     without specific prior written permission.
- *  
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
- *  IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- *  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- *  PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- *  HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- *  TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- *  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- *  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *-----------------------------------------------------------------------
-*/
 ;
 function eraDat(iy, im, id, fd)
-/*
-**  - - - - - - -
-**   e r a D a t
-**  - - - - - - -
-**
-**  For a given UTC date, calculate Delta(AT) = TAI-UTC.
-**
-**     :------------------------------------------:
-**     :                                          :
-**     :                 IMPORTANT                :
-**     :                                          :
-**     :  A new version of this function must be  :
-**     :  produced whenever a new leap second is  :
-**     :  announced.  There are four items to     :
-**     :  change on each such occasion:           :
-**     :                                          :
-**     :  1) A new line must be added to the set  :
-**     :     of statements that initialize the    :
-**     :     array "ERFA_LEAPSEC" in "erfam.js".  :
-**     :                                          :
-**     :  2) The constant ERFA_IYV must be set    :
-**     :     to the current year in "erfam.js".   :
-**     :                                          :
-**     :  3) The "Latest leap second" comment     :
-**     :     below must be set to the new leap    :
-**     :     second date.                         :
-**     :                                          :
-**     :  4) The "This revision" comment, later,  :
-**     :     must be set to the current date.     :
-**     :                                          :
-**     :  Change (2) must also be carried out     :
-**     :  whenever the function is re-issued,     :
-**     :  even if no leap seconds have been       :
-**     :  added.                                  :
-**     :                                          :
-**     :  Latest leap second:  2016 December 31   :
-**     :                                          :
-**     :__________________________________________:
-**
-**  Given:
-**     iy     int      UTC:  year (Notes 1 and 2)
-**     im     int            month (Note 2)
-**     id     int            day (Notes 2 and 3)
-**     fd     double         fraction of day (Note 4)
-**
-**  Returned:
-**     deltat double   TAI minus UTC, seconds
-**
-**  Returned (function value):
-**            int      status (Note 5):
-**                       1 = dubious year (Note 1)
-**                       0 = OK
-**                      -1 = bad year
-**                      -2 = bad month
-**                      -3 = bad day (Note 3)
-**                      -4 = bad fraction (Note 4)
-**                      -5 = internal error (Note 5)
-**
-**  Notes:
-**
-**  1) UTC began at 1960 January 1.0 (JD 2436934.5) and it is improper
-**     to call the function with an earlier date.  If this is attempted,
-**     zero is returned together with a warning status.
-**
-**     Because leap seconds cannot, in principle, be predicted in
-**     advance, a reliable check for dates beyond the valid range is
-**     impossible.  To guard against gross errors, a year five or more
-**     after the release year of the present function (see the constant
-**     ERFA_IYV) is considered dubious.  In this case a warning status
-**     is returned but the result is computed in the normal way.
-**
-**     For both too-early and too-late years, the warning status is +1.
-**     This is distinct from the error status -1, which signifies a year
-**     so early that JD could not be computed.
-**
-**  2) If the specified date is for a day which ends with a leap second,
-**     the TAI-UTC value returned is for the period leading up to the
-**     leap second.  If the date is for a day which begins as a leap
-**     second ends, the TAI-UTC returned is for the period following the
-**     leap second.
-**
-**  3) The day number must be in the normal calendar range, for example
-**     1 through 30 for April.  The "almanac" convention of allowing
-**     such dates as January 0 and December 32 is not supported in this
-**     function, in order to avoid confusion near leap seconds.
-**
-**  4) The fraction of day is used only for dates before the
-**     introduction of leap seconds, the first of which occurred at the
-**     end of 1971.  It is tested for validity (0 to 1 is the valid
-**     range) even if not used;  if invalid, zero is used and status -4
-**     is returned.  For many applications, setting fd to zero is
-**     acceptable;  the resulting error is always less than 3 ms (and
-**     occurs only pre-1972).
-**
-**  5) The status value returned in the case where there are multiple
-**     errors refers to the first error detected.  For example, if the
-**     month and day are 13 and 32 respectively, status -2 (bad month)
-**     will be returned.  The "internal error" status refers to a
-**     case that is impossible but causes some compilers to issue a
-**     warning.
-**
-**  6) In cases where a valid result is not available, zero is returned.
-**
-**  References:
-**
-**  1) For dates from 1961 January 1 onwards, the expressions from the
-**     file ftp://maia.usno.navy.mil/ser7/tai-utc.dat are used.
-**
-**  2) The 5ms timestep at 1961 January 1 is taken from 2.58.1 (p87) of
-**     the 1992 Explanatory Supplement.
-**
-**  Called:
-**     eraCal2jd    Gregorian calendar to JD
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var deltat = 0.0;
    var _rv2;
@@ -884,176 +330,8 @@ function eraDat(iy, im, id, fd)
    return [ j, deltat ];
 
 }
-/*
- *+----------------------------------------------------------------------
- *
- *  IAU SOFA functions converted to JS
- *  http:://www.github.com/mgreter/sofa.js
- *  2016 by Marcel Greter
- *
- *  The conversion is done by a custom hacked perl script.
- *  Automatically generates QUnit tests for all functions.
- *
- *  Please read notice below, as all rights go to the Standards
- *  Of Fundamental Astronomy (SOFA) Review Board of the International
- *  Astronomical Union, as far as applicable. There is no guarantee
- *  that the conversion is bug free and I give no warranty of
- *  usability or correctness whatsoever.
- *
- *  The agreement below (3c/d) says that functions should
- *  be renamed. From the preface I guess this only applies
- *  if the function behavior was changed in any way. Since
- *  this is a one-to-one conversion, it shouldn't apply?
- *
- *+----------------------------------------------------------------------
- * SOFA-Issue: 2016-05-03
- *+----------------------------------------------------------------------
- *
- *  Copyright (C) 2016
- *  Standards Of Fundamental Astronomy Review Board
- *  of the International Astronomical Union.
- *
- *  =====================
- *  SOFA Software License
- *  =====================
- *
- *  NOTICE TO USER:
- *
- *  BY USING THIS SOFTWARE YOU ACCEPT THE FOLLOWING TERMS AND CONDITIONS
- *  WHICH APPLY TO ITS USE.
- *
- *  1. The Software is owned by the IAU SOFA Review Board ("the Board").
- *
- *  2. Permission is granted to anyone to use the SOFA software for any
- *     purpose, including commercial applications, free of charge and
- *     without payment of royalties, subject to the conditions and
- *     restrictions listed below.
- *
- *  3. You (the user) may copy and adapt the SOFA software and its
- *     algorithms for your own purposes and you may copy and distribute
- *     a resulting "derived work" to others on a world-wide, royalty-free
- *     basis, provided that the derived work complies with the following
- *     requirements:
- *
- *     a) Your work shall be marked or carry a statement that it (i) uses
- *        routines and computations derived by you from software provided
- *        by SOFA under license to you; and (ii) does not contain
- *        software provided by SOFA or software that has been distributed
- *        by or endorsed by SOFA.
- *
- *     b) The source code of your derived work must contain descriptions
- *        of how the derived work is based upon and/or differs from the
- *        original SOFA software.
- *
- *     c) The name(s) of all routine(s) that you distribute shall differ
- *        from the SOFA names, even when the SOFA content has not been
- *        otherwise changed.
- *
- *     d) The routine-naming prefix "iau" shall not be used.
- *
- *     e) The origin of the SOFA components of your derived work must not
- *        be misrepresented;  you must not claim that you wrote the
- *        original software, nor file a patent application for SOFA
- *        software or algorithms embedded in the SOFA software.
- *
- *     f) These requirements must be reproduced intact in any source
- *        distribution and shall apply to anyone to whom you have granted
- *        a further right to modify the source code of your derived work.
- *
- *  4. In any published work or commercial products which includes
- *     results achieved by using the SOFA software, you shall acknowledge
- *     that the SOFA software was used in obtaining those results.
- *
- *  5. You shall not cause the SOFA software to be brought into
- *     disrepute, either by misuse, or use for inappropriate tasks, or by
- *     inappropriate modification.
- *
- *  6. The SOFA software is provided "as is" and the Board makes no
- *     warranty as to its use or performance.   The Board does not and
- *     cannot warrant the performance or results which the user may obtain
- *     by using the SOFA software.  The Board makes no warranties, express
- *     or implied, as to non-infringement of third party rights,
- *     merchantability, or fitness for any particular purpose.  In no
- *     event will the Board be liable to the user for any consequential,
- *     incidental, or special damages, including any lost profits or lost
- *     savings, even if a Board representative has been advised of such
- *     damages, or for any claim by any third party.
- *
- *  7. The provision of any version of the SOFA software under the terms
- *     and conditions specified herein does not imply that future
- *     versions will also be made available under the same terms and
- *     conditions.
-
- *  Correspondence concerning SOFA software should be addressed as
- *  follows:
- *
- *     Internet email: sofa@rl.ac.uk
- *     Postal address: IAU SOFA Center
- *                     Rutherford Appleton Laboratory
- *                     Chilton, Didcot, Oxon OX11 0QX
- *                     United Kingdom
- *
- *-----------------------------------------------------------------------
-*/
 ;
 function eraEform( n)
-/*
-**  - - - - - - - - -
-**   e r a E f o r m
-**  - - - - - - - - -
-**
-**  Earth reference ellipsoids.
-**
-**  Given:
-**     n    int         ellipsoid identifier (Note 1)
-**
-**  Returned:
-**     a    double      equatorial radius (meters, Note 2)
-**     f    double      flattening (Note 2)
-**
-**  Returned (function value):
-**          int         status:  0 = OK
-**                              -1 = illegal identifier (Note 3)
-**
-**  Notes:
-**
-**  1) The identifier n is a number that specifies the choice of
-**     reference ellipsoid.  The following are supported:
-**
-**        n    ellipsoid
-**
-**        1     ERFA_WGS84
-**        2     ERFA_GRS80
-**        3     ERFA_WGS72
-**
-**     The n value has no significance outside the ERFA software.  For
-**     convenience, symbols ERFA_WGS84 etc. are defined in erfam.h.
-**
-**  2) The ellipsoid parameters are returned in the form of equatorial
-**     radius in meters (a) and flattening (f).  The latter is a number
-**     around 0.00335, i.e. around 1/298.
-**
-**  3) For the case where an unsupported n value is supplied, zero a and
-**     f are returned, as well as error status.
-**
-**  References:
-**
-**     Department of Defense World Geodetic System 1984, National
-**     Imagery and Mapping Agency Technical Report 8350.2, Third
-**     Edition, p3-2.
-**
-**     Moritz, H., Bull. Geodesique 66-2, 187 (1992).
-**
-**     The Department of Defense World Geodetic System 1972, World
-**     Geodetic System Committee, May 1974.
-**
-**     Explanatory Supplement to the Astronomical Almanac,
-**     P. Kenneth Seidelmann (ed), University Science Books (1992),
-**     p220.
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var a = 0.0;;
    var f = 0.0;;
@@ -1090,137 +368,8 @@ function eraEform( n)
    return [ 0, a, f  ];
 
 }
-/*
- *+----------------------------------------------------------------------
- *
- *  ERFA/SOFA functions converted to JS
- *  Copyright (C) 2020 by Marcel Greter
- *  http:://www.github.com/mgreter/sofa.js
- *
- *  The conversion is done by a custom hacked perl script.
- *  Automatically generates QUnit tests for all functions.
- *
- *  Conversion is made from liberfa sources:
- *  https://github.com/liberfa/erfa
- *
- *+----------------------------------------------------------------------
- *  THIS WORK IS RELEASED UNDER THE SAME TERMS AS ERFA:
- *+----------------------------------------------------------------------
- *
- *  Copyright (C) 2013-2014, NumFOCUS Foundation.
- *  All rights reserved.
- *  
- *  This library is derived, with permission, from the International
- *  Astronomical Union's "Standards of Fundamental Astronomy" library,
- *  available from http://www.iausofa.org.
- *  
- *  The ERFA version is intended to retain identical
- *  functionality to the SOFA library, but made distinct through
- *  different function and file names, as set out in the SOFA license
- *  conditions. The SOFA original has a role as a reference standard
- *  for the IAU and IERS, and consequently redistribution is permitted only
- *  in its unaltered state. The ERFA version is not subject to this
- *  restriction and therefore can be included in distributions which do not
- *  support the concept of "read only" software.
- *  
- *  Although the intent is to replicate the SOFA API (other than replacement of
- *  prefix names) and results (with the exception of bugs; any that are
- *  discovered will be fixed), SOFA is not responsible for any errors found
- *  in this version of the library.
- *  
- *  If you wish to acknowledge the SOFA heritage, please acknowledge that
- *  you are using a library derived from SOFA, rather than SOFA itself.
- *  
- *  
- *  TERMS AND CONDITIONS
- *  
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions are met:
- *  
- *  1 Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  
- *  2 Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  
- *  3 Neither the name of the Standards Of Fundamental Astronomy Board, the
- *     International Astronomical Union nor the names of its contributors
- *     may be used to endorse or promote products derived from this software
- *     without specific prior written permission.
- *  
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
- *  IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- *  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- *  PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- *  HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- *  TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- *  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- *  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *-----------------------------------------------------------------------
-*/
 ;
 function eraEra00(dj1, dj2)
-/*
-**  - - - - - - - - -
-**   e r a E r a 0 0
-**  - - - - - - - - -
-**
-**  Earth rotation angle (IAU 2000 model).
-**
-**  Given:
-**     dj1,dj2   double    UT1 as a 2-part Julian Date (see note)
-**
-**  Returned (function value):
-**               double    Earth rotation angle (radians), range 0-2pi
-**
-**  Notes:
-**
-**  1) The UT1 date dj1+dj2 is a Julian Date, apportioned in any
-**     convenient way between the arguments dj1 and dj2.  For example,
-**     JD(UT1)=2450123.7 could be expressed in any of these ways,
-**     among others:
-**
-**             dj1            dj2
-**
-**         2450123.7           0.0       (JD method)
-**         2451545.0       -1421.3       (J2000 method)
-**         2400000.5       50123.2       (MJD method)
-**         2450123.5           0.2       (date & time method)
-**
-**     The JD method is the most natural and convenient to use in
-**     cases where the loss of several decimal digits of resolution
-**     is acceptable.  The J2000 and MJD methods are good compromises
-**     between resolution and convenience.  The date & time method is
-**     best matched to the algorithm used:  maximum precision is
-**     delivered when the dj1 argument is for 0hrs UT1 on the day in
-**     question and the dj2 argument lies in the range 0 to 1, or vice
-**     versa.
-**
-**  2) The algorithm is adapted from Expression 22 of Capitaine et al.
-**     2000.  The time argument has been expressed in days directly,
-**     and, to retain precision, integer contributions have been
-**     eliminated.  The same formulation is given in IERS Conventions
-**     (2003), Chap. 5, Eq. 14.
-**
-**  Called:
-**     eraAnp       normalize angle into range 0 to 2pi
-**
-**  References:
-**
-**     Capitaine N., Guinot B. and McCarthy D.D, 2000, Astron.
-**     Astrophys., 355, 398-405.
-**
-**     McCarthy, D. D., Petit, G. (eds.), IERS Conventions (2003),
-**     IERS Technical Note No. 32, BKG (2004)
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var d1, d2, t, f, theta;
 
@@ -1245,147 +394,8 @@ function eraEra00(dj1, dj2)
    return theta;
 
 }
-/*
- *+----------------------------------------------------------------------
- *
- *  ERFA/SOFA functions converted to JS
- *  Copyright (C) 2020 by Marcel Greter
- *  http:://www.github.com/mgreter/sofa.js
- *
- *  The conversion is done by a custom hacked perl script.
- *  Automatically generates QUnit tests for all functions.
- *
- *  Conversion is made from liberfa sources:
- *  https://github.com/liberfa/erfa
- *
- *+----------------------------------------------------------------------
- *  THIS WORK IS RELEASED UNDER THE SAME TERMS AS ERFA:
- *+----------------------------------------------------------------------
- *
- *  Copyright (C) 2013-2014, NumFOCUS Foundation.
- *  All rights reserved.
- *  
- *  This library is derived, with permission, from the International
- *  Astronomical Union's "Standards of Fundamental Astronomy" library,
- *  available from http://www.iausofa.org.
- *  
- *  The ERFA version is intended to retain identical
- *  functionality to the SOFA library, but made distinct through
- *  different function and file names, as set out in the SOFA license
- *  conditions. The SOFA original has a role as a reference standard
- *  for the IAU and IERS, and consequently redistribution is permitted only
- *  in its unaltered state. The ERFA version is not subject to this
- *  restriction and therefore can be included in distributions which do not
- *  support the concept of "read only" software.
- *  
- *  Although the intent is to replicate the SOFA API (other than replacement of
- *  prefix names) and results (with the exception of bugs; any that are
- *  discovered will be fixed), SOFA is not responsible for any errors found
- *  in this version of the library.
- *  
- *  If you wish to acknowledge the SOFA heritage, please acknowledge that
- *  you are using a library derived from SOFA, rather than SOFA itself.
- *  
- *  
- *  TERMS AND CONDITIONS
- *  
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions are met:
- *  
- *  1 Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  
- *  2 Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  
- *  3 Neither the name of the Standards Of Fundamental Astronomy Board, the
- *     International Astronomical Union nor the names of its contributors
- *     may be used to endorse or promote products derived from this software
- *     without specific prior written permission.
- *  
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
- *  IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- *  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- *  PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- *  HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- *  TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- *  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- *  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *-----------------------------------------------------------------------
-*/
 ;
 function eraFw2m(gamb, phib, psi, eps)
-/*
-**  - - - - - - - -
-**   e r a F w 2 m
-**  - - - - - - - -
-**
-**  Form rotation matrix given the Fukushima-Williams angles.
-**
-**  Given:
-**     gamb     double         F-W angle gamma_bar (radians)
-**     phib     double         F-W angle phi_bar (radians)
-**     psi      double         F-W angle psi (radians)
-**     eps      double         F-W angle epsilon (radians)
-**
-**  Returned:
-**     r        double[3][3]   rotation matrix
-**
-**  Notes:
-**
-**  1) Naming the following points:
-**
-**           e = J2000.0 ecliptic pole,
-**           p = GCRS pole,
-**           E = ecliptic pole of date,
-**     and   P = CIP,
-**
-**     the four Fukushima-Williams angles are as follows:
-**
-**        gamb = gamma = epE
-**        phib = phi = pE
-**        psi = psi = pEP
-**        eps = epsilon = EP
-**
-**  2) The matrix representing the combined effects of frame bias,
-**     precession and nutation is:
-**
-**        NxPxB = R_1(-eps).R_3(-psi).R_1(phib).R_3(gamb)
-**
-**  3) Three different matrices can be constructed, depending on the
-**     supplied angles:
-**
-**     o  To obtain the nutation x precession x frame bias matrix,
-**        generate the four precession angles, generate the nutation
-**        components and add them to the psi_bar and epsilon_A angles,
-**        and call the present function.
-**
-**     o  To obtain the precession x frame bias matrix, generate the
-**        four precession angles and call the present function.
-**
-**     o  To obtain the frame bias matrix, generate the four precession
-**        angles for date J2000.0 and call the present function.
-**
-**     The nutation-only and precession-only matrices can if necessary
-**     be obtained by combining these three appropriately.
-**
-**  Called:
-**     eraIr        initialize r-matrix to identity
-**     eraRz        rotate around Z-axis
-**     eraRx        rotate around X-axis
-**
-**  Reference:
-**
-**     Hilton, J. et al., 2006, Celest.Mech.Dyn.Astron. 94, 351
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var r = [ [0,0,0], [0,0,0], [0,0,0] ];;
    if (typeof r == 'undefined') {
@@ -1402,136 +412,8 @@ function eraFw2m(gamb, phib, psi, eps)
    return r;
 
 }
-/*
- *+----------------------------------------------------------------------
- *
- *  ERFA/SOFA functions converted to JS
- *  Copyright (C) 2020 by Marcel Greter
- *  http:://www.github.com/mgreter/sofa.js
- *
- *  The conversion is done by a custom hacked perl script.
- *  Automatically generates QUnit tests for all functions.
- *
- *  Conversion is made from liberfa sources:
- *  https://github.com/liberfa/erfa
- *
- *+----------------------------------------------------------------------
- *  THIS WORK IS RELEASED UNDER THE SAME TERMS AS ERFA:
- *+----------------------------------------------------------------------
- *
- *  Copyright (C) 2013-2014, NumFOCUS Foundation.
- *  All rights reserved.
- *  
- *  This library is derived, with permission, from the International
- *  Astronomical Union's "Standards of Fundamental Astronomy" library,
- *  available from http://www.iausofa.org.
- *  
- *  The ERFA version is intended to retain identical
- *  functionality to the SOFA library, but made distinct through
- *  different function and file names, as set out in the SOFA license
- *  conditions. The SOFA original has a role as a reference standard
- *  for the IAU and IERS, and consequently redistribution is permitted only
- *  in its unaltered state. The ERFA version is not subject to this
- *  restriction and therefore can be included in distributions which do not
- *  support the concept of "read only" software.
- *  
- *  Although the intent is to replicate the SOFA API (other than replacement of
- *  prefix names) and results (with the exception of bugs; any that are
- *  discovered will be fixed), SOFA is not responsible for any errors found
- *  in this version of the library.
- *  
- *  If you wish to acknowledge the SOFA heritage, please acknowledge that
- *  you are using a library derived from SOFA, rather than SOFA itself.
- *  
- *  
- *  TERMS AND CONDITIONS
- *  
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions are met:
- *  
- *  1 Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  
- *  2 Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  
- *  3 Neither the name of the Standards Of Fundamental Astronomy Board, the
- *     International Astronomical Union nor the names of its contributors
- *     may be used to endorse or promote products derived from this software
- *     without specific prior written permission.
- *  
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
- *  IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- *  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- *  PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- *  HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- *  TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- *  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- *  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *-----------------------------------------------------------------------
-*/
 ;
 function eraGd2gc( n, elong, phi, height)
-/*
-**  - - - - - - - - -
-**   e r a G d 2 g c
-**  - - - - - - - - -
-**
-**  Transform geodetic coordinates to geocentric using the specified
-**  reference ellipsoid.
-**
-**  Given:
-**     n       int        ellipsoid identifier (Note 1)
-**     elong   double     longitude (radians, east +ve)
-**     phi     double     latitude (geodetic, radians, Note 3)
-**     height  double     height above ellipsoid (geodetic, Notes 2,3)
-**
-**  Returned:
-**     xyz     double[3]  geocentric vector (Note 2)
-**
-**  Returned (function value):
-**             int        status:  0 = OK
-**                                -1 = illegal identifier (Note 3)
-**                                -2 = illegal case (Note 3)
-**
-**  Notes:
-**
-**  1) The identifier n is a number that specifies the choice of
-**     reference ellipsoid.  The following are supported:
-**
-**        n    ellipsoid
-**
-**        1     ERFA_WGS84
-**        2     ERFA_GRS80
-**        3     ERFA_WGS72
-**
-**     The n value has no significance outside the ERFA software.  For
-**     convenience, symbols ERFA_WGS84 etc. are defined in erfam.h.
-**
-**  2) The height (height, given) and the geocentric vector (xyz,
-**     returned) are in meters.
-**
-**  3) No validation is performed on the arguments elong, phi and
-**     height.  An error status -1 means that the identifier n is
-**     illegal.  An error status -2 protects against cases that would
-**     lead to arithmetic exceptions.  In all error cases, xyz is set
-**     to zeros.
-**
-**  4) The inverse transformation is performed in the function eraGc2gd.
-**
-**  Called:
-**     eraEform     Earth reference ellipsoids
-**     eraGd2gce    geodetic to geocentric transformation, general
-**     eraZp        zero p-vector
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var xyz = [0, 0, 0];;
    var _rv1, _rv2;
@@ -1559,137 +441,8 @@ function eraGd2gc( n, elong, phi, height)
    return [ j, xyz  ];
 
 }
-/*
- *+----------------------------------------------------------------------
- *
- *  ERFA/SOFA functions converted to JS
- *  Copyright (C) 2020 by Marcel Greter
- *  http:://www.github.com/mgreter/sofa.js
- *
- *  The conversion is done by a custom hacked perl script.
- *  Automatically generates QUnit tests for all functions.
- *
- *  Conversion is made from liberfa sources:
- *  https://github.com/liberfa/erfa
- *
- *+----------------------------------------------------------------------
- *  THIS WORK IS RELEASED UNDER THE SAME TERMS AS ERFA:
- *+----------------------------------------------------------------------
- *
- *  Copyright (C) 2013-2014, NumFOCUS Foundation.
- *  All rights reserved.
- *  
- *  This library is derived, with permission, from the International
- *  Astronomical Union's "Standards of Fundamental Astronomy" library,
- *  available from http://www.iausofa.org.
- *  
- *  The ERFA version is intended to retain identical
- *  functionality to the SOFA library, but made distinct through
- *  different function and file names, as set out in the SOFA license
- *  conditions. The SOFA original has a role as a reference standard
- *  for the IAU and IERS, and consequently redistribution is permitted only
- *  in its unaltered state. The ERFA version is not subject to this
- *  restriction and therefore can be included in distributions which do not
- *  support the concept of "read only" software.
- *  
- *  Although the intent is to replicate the SOFA API (other than replacement of
- *  prefix names) and results (with the exception of bugs; any that are
- *  discovered will be fixed), SOFA is not responsible for any errors found
- *  in this version of the library.
- *  
- *  If you wish to acknowledge the SOFA heritage, please acknowledge that
- *  you are using a library derived from SOFA, rather than SOFA itself.
- *  
- *  
- *  TERMS AND CONDITIONS
- *  
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions are met:
- *  
- *  1 Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  
- *  2 Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  
- *  3 Neither the name of the Standards Of Fundamental Astronomy Board, the
- *     International Astronomical Union nor the names of its contributors
- *     may be used to endorse or promote products derived from this software
- *     without specific prior written permission.
- *  
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
- *  IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- *  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- *  PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- *  HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- *  TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- *  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- *  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *-----------------------------------------------------------------------
-*/
 ;
 function eraGd2gce( a, f, elong, phi, height)
-/*
-**  - - - - - - - - - -
-**   e r a G d 2 g c e
-**  - - - - - - - - - -
-**
-**  Transform geodetic coordinates to geocentric for a reference
-**  ellipsoid of specified form.
-**
-**  Given:
-**     a       double     equatorial radius (Notes 1,4)
-**     f       double     flattening (Notes 2,4)
-**     elong   double     longitude (radians, east +ve)
-**     phi     double     latitude (geodetic, radians, Note 4)
-**     height  double     height above ellipsoid (geodetic, Notes 3,4)
-**
-**  Returned:
-**     xyz     double[3]  geocentric vector (Note 3)
-**
-**  Returned (function value):
-**             int        status:  0 = OK
-**                                -1 = illegal case (Note 4)
-**  Notes:
-**
-**  1) The equatorial radius, a, can be in any units, but meters is
-**     the conventional choice.
-**
-**  2) The flattening, f, is (for the Earth) a value around 0.00335,
-**     i.e. around 1/298.
-**
-**  3) The equatorial radius, a, and the height, height, must be
-**     given in the same units, and determine the units of the
-**     returned geocentric vector, xyz.
-**
-**  4) No validation is performed on individual arguments.  The error
-**     status -1 protects against (unrealistic) cases that would lead
-**     to arithmetic exceptions.  If an error occurs, xyz is unchanged.
-**
-**  5) The inverse transformation is performed in the function
-**     eraGc2gde.
-**
-**  6) The transformation for a standard ellipsoid (such as ERFA_WGS84) can
-**     more conveniently be performed by calling eraGd2gc,  which uses a
-**     numerical code to identify the required a and f values.
-**
-**  References:
-**
-**     Green, R.M., Spherical Astronomy, Cambridge University Press,
-**     (1985) Section 4.5, p96.
-**
-**     Explanatory Supplement to the Astronomical Almanac,
-**     P. Kenneth Seidelmann (ed), University Science Books (1992),
-**     Section 4.22, p202.
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var xyz = [0, 0, 0];;
 
@@ -1717,151 +470,8 @@ function eraGd2gce( a, f, elong, phi, height)
    return [ 0, xyz  ];
 
 }
-/*
- *+----------------------------------------------------------------------
- *
- *  ERFA/SOFA functions converted to JS
- *  Copyright (C) 2020 by Marcel Greter
- *  http:://www.github.com/mgreter/sofa.js
- *
- *  The conversion is done by a custom hacked perl script.
- *  Automatically generates QUnit tests for all functions.
- *
- *  Conversion is made from liberfa sources:
- *  https://github.com/liberfa/erfa
- *
- *+----------------------------------------------------------------------
- *  THIS WORK IS RELEASED UNDER THE SAME TERMS AS ERFA:
- *+----------------------------------------------------------------------
- *
- *  Copyright (C) 2013-2014, NumFOCUS Foundation.
- *  All rights reserved.
- *  
- *  This library is derived, with permission, from the International
- *  Astronomical Union's "Standards of Fundamental Astronomy" library,
- *  available from http://www.iausofa.org.
- *  
- *  The ERFA version is intended to retain identical
- *  functionality to the SOFA library, but made distinct through
- *  different function and file names, as set out in the SOFA license
- *  conditions. The SOFA original has a role as a reference standard
- *  for the IAU and IERS, and consequently redistribution is permitted only
- *  in its unaltered state. The ERFA version is not subject to this
- *  restriction and therefore can be included in distributions which do not
- *  support the concept of "read only" software.
- *  
- *  Although the intent is to replicate the SOFA API (other than replacement of
- *  prefix names) and results (with the exception of bugs; any that are
- *  discovered will be fixed), SOFA is not responsible for any errors found
- *  in this version of the library.
- *  
- *  If you wish to acknowledge the SOFA heritage, please acknowledge that
- *  you are using a library derived from SOFA, rather than SOFA itself.
- *  
- *  
- *  TERMS AND CONDITIONS
- *  
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions are met:
- *  
- *  1 Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  
- *  2 Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  
- *  3 Neither the name of the Standards Of Fundamental Astronomy Board, the
- *     International Astronomical Union nor the names of its contributors
- *     may be used to endorse or promote products derived from this software
- *     without specific prior written permission.
- *  
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
- *  IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- *  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- *  PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- *  HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- *  TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- *  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- *  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *-----------------------------------------------------------------------
-*/
 ;
 function eraGmst00(uta, utb, tta, ttb)
-/*
-**  - - - - - - - - - -
-**   e r a G m s t 0 0
-**  - - - - - - - - - -
-**
-**  Greenwich mean sidereal time (model consistent with IAU 2000
-**  resolutions).
-**
-**  Given:
-**     uta,utb    double    UT1 as a 2-part Julian Date (Notes 1,2)
-**     tta,ttb    double    TT as a 2-part Julian Date (Notes 1,2)
-**
-**  Returned (function value):
-**                double    Greenwich mean sidereal time (radians)
-**
-**  Notes:
-**
-**  1) The UT1 and TT dates uta+utb and tta+ttb respectively, are both
-**     Julian Dates, apportioned in any convenient way between the
-**     argument pairs.  For example, JD=2450123.7 could be expressed in
-**     any of these ways, among others:
-**
-**            Part A         Part B
-**
-**         2450123.7           0.0       (JD method)
-**         2451545.0       -1421.3       (J2000 method)
-**         2400000.5       50123.2       (MJD method)
-**         2450123.5           0.2       (date & time method)
-**
-**     The JD method is the most natural and convenient to use in
-**     cases where the loss of several decimal digits of resolution
-**     is acceptable (in the case of UT;  the TT is not at all critical
-**     in this respect).  The J2000 and MJD methods are good compromises
-**     between resolution and convenience.  For UT, the date & time
-**     method is best matched to the algorithm that is used by the Earth
-**     Rotation Angle function, called internally:  maximum precision is
-**     delivered when the uta argument is for 0hrs UT1 on the day in
-**     question and the utb argument lies in the range 0 to 1, or vice
-**     versa.
-**
-**  2) Both UT1 and TT are required, UT1 to predict the Earth rotation
-**     and TT to predict the effects of precession.  If UT1 is used for
-**     both purposes, errors of order 100 microarcseconds result.
-**
-**  3) This GMST is compatible with the IAU 2000 resolutions and must be
-**     used only in conjunction with other IAU 2000 compatible
-**     components such as precession-nutation and equation of the
-**     equinoxes.
-**
-**  4) The result is returned in the range 0 to 2pi.
-**
-**  5) The algorithm is from Capitaine et al. (2003) and IERS
-**     Conventions 2003.
-**
-**  Called:
-**     eraEra00     Earth rotation angle, IAU 2000
-**     eraAnp       normalize angle into range 0 to 2pi
-**
-**  References:
-**
-**     Capitaine, N., Wallace, P.T. and McCarthy, D.D., "Expressions to
-**     implement the IAU 2000 definition of UT1", Astronomy &
-**     Astrophysics, 406, 1135-1149 (2003)
-**
-**     McCarthy, D. D., Petit, G. (eds.), IERS Conventions (2003),
-**     IERS Technical Note No. 32, BKG (2004)
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var t, gmst;
 
@@ -1881,94 +491,8 @@ function eraGmst00(uta, utb, tta, ttb)
    return gmst;
 
 }
-/*
- *+----------------------------------------------------------------------
- *
- *  ERFA/SOFA functions converted to JS
- *  Copyright (C) 2020 by Marcel Greter
- *  http:://www.github.com/mgreter/sofa.js
- *
- *  The conversion is done by a custom hacked perl script.
- *  Automatically generates QUnit tests for all functions.
- *
- *  Conversion is made from liberfa sources:
- *  https://github.com/liberfa/erfa
- *
- *+----------------------------------------------------------------------
- *  THIS WORK IS RELEASED UNDER THE SAME TERMS AS ERFA:
- *+----------------------------------------------------------------------
- *
- *  Copyright (C) 2013-2014, NumFOCUS Foundation.
- *  All rights reserved.
- *  
- *  This library is derived, with permission, from the International
- *  Astronomical Union's "Standards of Fundamental Astronomy" library,
- *  available from http://www.iausofa.org.
- *  
- *  The ERFA version is intended to retain identical
- *  functionality to the SOFA library, but made distinct through
- *  different function and file names, as set out in the SOFA license
- *  conditions. The SOFA original has a role as a reference standard
- *  for the IAU and IERS, and consequently redistribution is permitted only
- *  in its unaltered state. The ERFA version is not subject to this
- *  restriction and therefore can be included in distributions which do not
- *  support the concept of "read only" software.
- *  
- *  Although the intent is to replicate the SOFA API (other than replacement of
- *  prefix names) and results (with the exception of bugs; any that are
- *  discovered will be fixed), SOFA is not responsible for any errors found
- *  in this version of the library.
- *  
- *  If you wish to acknowledge the SOFA heritage, please acknowledge that
- *  you are using a library derived from SOFA, rather than SOFA itself.
- *  
- *  
- *  TERMS AND CONDITIONS
- *  
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions are met:
- *  
- *  1 Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  
- *  2 Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  
- *  3 Neither the name of the Standards Of Fundamental Astronomy Board, the
- *     International Astronomical Union nor the names of its contributors
- *     may be used to endorse or promote products derived from this software
- *     without specific prior written permission.
- *  
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
- *  IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- *  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- *  PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- *  HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- *  TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- *  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- *  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *-----------------------------------------------------------------------
-*/
 ;
 function eraIr()
-/*
-**  - - - - - -
-**   e r a I r
-**  - - - - - -
-**
-**  Initialize an r-matrix to the identity matrix.
-**
-**  Returned:
-**     r       double[3][3]    r-matrix
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var r = [ [0,0,0], [0,0,0], [0,0,0] ];;
    if (typeof r == 'undefined') {
@@ -1988,132 +512,8 @@ function eraIr()
    return r;
 
 }
-/*
- *+----------------------------------------------------------------------
- *
- *  ERFA/SOFA functions converted to JS
- *  Copyright (C) 2020 by Marcel Greter
- *  http:://www.github.com/mgreter/sofa.js
- *
- *  The conversion is done by a custom hacked perl script.
- *  Automatically generates QUnit tests for all functions.
- *
- *  Conversion is made from liberfa sources:
- *  https://github.com/liberfa/erfa
- *
- *+----------------------------------------------------------------------
- *  THIS WORK IS RELEASED UNDER THE SAME TERMS AS ERFA:
- *+----------------------------------------------------------------------
- *
- *  Copyright (C) 2013-2014, NumFOCUS Foundation.
- *  All rights reserved.
- *  
- *  This library is derived, with permission, from the International
- *  Astronomical Union's "Standards of Fundamental Astronomy" library,
- *  available from http://www.iausofa.org.
- *  
- *  The ERFA version is intended to retain identical
- *  functionality to the SOFA library, but made distinct through
- *  different function and file names, as set out in the SOFA license
- *  conditions. The SOFA original has a role as a reference standard
- *  for the IAU and IERS, and consequently redistribution is permitted only
- *  in its unaltered state. The ERFA version is not subject to this
- *  restriction and therefore can be included in distributions which do not
- *  support the concept of "read only" software.
- *  
- *  Although the intent is to replicate the SOFA API (other than replacement of
- *  prefix names) and results (with the exception of bugs; any that are
- *  discovered will be fixed), SOFA is not responsible for any errors found
- *  in this version of the library.
- *  
- *  If you wish to acknowledge the SOFA heritage, please acknowledge that
- *  you are using a library derived from SOFA, rather than SOFA itself.
- *  
- *  
- *  TERMS AND CONDITIONS
- *  
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions are met:
- *  
- *  1 Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  
- *  2 Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  
- *  3 Neither the name of the Standards Of Fundamental Astronomy Board, the
- *     International Astronomical Union nor the names of its contributors
- *     may be used to endorse or promote products derived from this software
- *     without specific prior written permission.
- *  
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
- *  IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- *  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- *  PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- *  HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- *  TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- *  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- *  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *-----------------------------------------------------------------------
-*/
 ;
 function eraJd2cal(dj1, dj2)
-/*
-**  - - - - - - - - - -
-**   e r a J d 2 c a l
-**  - - - - - - - - - -
-**
-**  Julian Date to Gregorian year, month, day, and fraction of a day.
-**
-**  Given:
-**     dj1,dj2   double   Julian Date (Notes 1, 2)
-**
-**  Returned (arguments):
-**     iy        int      year
-**     im        int      month
-**     id        int      day
-**     fd        double   fraction of day
-**
-**  Returned (function value):
-**               int      status:
-**                           0 = OK
-**                          -1 = unacceptable date (Note 1)
-**
-**  Notes:
-**
-**  1) The earliest valid date is -68569.5 (-4900 March 1).  The
-**     largest value accepted is 1e9.
-**
-**  2) The Julian Date is apportioned in any convenient way between
-**     the arguments dj1 and dj2.  For example, JD=2450123.7 could
-**     be expressed in any of these ways, among others:
-**
-**            dj1             dj2
-**
-**         2450123.7           0.0       (JD method)
-**         2451545.0       -1421.3       (J2000 method)
-**         2400000.5       50123.2       (MJD method)
-**         2450123.5           0.2       (date & time method)
-**
-**  3) In early eras the conversion is from the "proleptic Gregorian
-**     calendar";  no account is taken of the date(s) of adoption of
-**     the Gregorian calendar, nor is the AD/BC numbering convention
-**     observed.
-**
-**  Reference:
-**
-**     Explanatory Supplement to the Astronomical Almanac,
-**     P. Kenneth Seidelmann (ed), University Science Books (1992),
-**     Section 12.92 (p604).
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var iy = 0;;
    var im = 0;;
@@ -2167,135 +567,8 @@ function eraJd2cal(dj1, dj2)
    return [ 0, iy, im, id, fd ];
 
 }
-/*
- *+----------------------------------------------------------------------
- *
- *  ERFA/SOFA functions converted to JS
- *  Copyright (C) 2020 by Marcel Greter
- *  http:://www.github.com/mgreter/sofa.js
- *
- *  The conversion is done by a custom hacked perl script.
- *  Automatically generates QUnit tests for all functions.
- *
- *  Conversion is made from liberfa sources:
- *  https://github.com/liberfa/erfa
- *
- *+----------------------------------------------------------------------
- *  THIS WORK IS RELEASED UNDER THE SAME TERMS AS ERFA:
- *+----------------------------------------------------------------------
- *
- *  Copyright (C) 2013-2014, NumFOCUS Foundation.
- *  All rights reserved.
- *  
- *  This library is derived, with permission, from the International
- *  Astronomical Union's "Standards of Fundamental Astronomy" library,
- *  available from http://www.iausofa.org.
- *  
- *  The ERFA version is intended to retain identical
- *  functionality to the SOFA library, but made distinct through
- *  different function and file names, as set out in the SOFA license
- *  conditions. The SOFA original has a role as a reference standard
- *  for the IAU and IERS, and consequently redistribution is permitted only
- *  in its unaltered state. The ERFA version is not subject to this
- *  restriction and therefore can be included in distributions which do not
- *  support the concept of "read only" software.
- *  
- *  Although the intent is to replicate the SOFA API (other than replacement of
- *  prefix names) and results (with the exception of bugs; any that are
- *  discovered will be fixed), SOFA is not responsible for any errors found
- *  in this version of the library.
- *  
- *  If you wish to acknowledge the SOFA heritage, please acknowledge that
- *  you are using a library derived from SOFA, rather than SOFA itself.
- *  
- *  
- *  TERMS AND CONDITIONS
- *  
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions are met:
- *  
- *  1 Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  
- *  2 Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  
- *  3 Neither the name of the Standards Of Fundamental Astronomy Board, the
- *     International Astronomical Union nor the names of its contributors
- *     may be used to endorse or promote products derived from this software
- *     without specific prior written permission.
- *  
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
- *  IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- *  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- *  PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- *  HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- *  TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- *  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- *  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *-----------------------------------------------------------------------
-*/
 ;
 function eraNum00a(date1, date2)
-/*
-**  - - - - - - - - - -
-**   e r a N u m 0 0 a
-**  - - - - - - - - - -
-**
-**  Form the matrix of nutation for a given date, IAU 2000A model.
-**
-**  Given:
-**     date1,date2  double          TT as a 2-part Julian Date (Note 1)
-**
-**  Returned:
-**     rmatn        double[3][3]    nutation matrix
-**
-**  Notes:
-**
-**  1) The TT date date1+date2 is a Julian Date, apportioned in any
-**     convenient way between the two arguments.  For example,
-**     JD(TT)=2450123.7 could be expressed in any of these ways,
-**     among others:
-**
-**            date1          date2
-**
-**         2450123.7           0.0       (JD method)
-**         2451545.0       -1421.3       (J2000 method)
-**         2400000.5       50123.2       (MJD method)
-**         2450123.5           0.2       (date & time method)
-**
-**     The JD method is the most natural and convenient to use in
-**     cases where the loss of several decimal digits of resolution
-**     is acceptable.  The J2000 method is best matched to the way
-**     the argument is handled internally and will deliver the
-**     optimum resolution.  The MJD method and the date & time methods
-**     are both good compromises between resolution and convenience.
-**
-**  2) The matrix operates in the sense V(true) = rmatn * V(mean), where
-**     the p-vector V(true) is with respect to the true equatorial triad
-**     of date and the p-vector V(mean) is with respect to the mean
-**     equatorial triad of date.
-**
-**  3) A faster, but slightly less accurate result (about 1 mas), can be
-**     obtained by using instead the eraNum00b function.
-**
-**  Called:
-**     eraPn00a     bias/precession/nutation, IAU 2000A
-**
-**  Reference:
-**
-**     Explanatory Supplement to the Astronomical Almanac,
-**     P. Kenneth Seidelmann (ed), University Science Books (1992),
-**     Section 3.222-3 (p114).
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var rmatn = [ [0,0,0], [0,0,0], [0,0,0] ];;
    if (typeof rmatn == 'undefined') {
@@ -2319,125 +592,8 @@ function eraNum00a(date1, date2)
    return rmatn;
 
 }
-/*
- *+----------------------------------------------------------------------
- *
- *  ERFA/SOFA functions converted to JS
- *  Copyright (C) 2020 by Marcel Greter
- *  http:://www.github.com/mgreter/sofa.js
- *
- *  The conversion is done by a custom hacked perl script.
- *  Automatically generates QUnit tests for all functions.
- *
- *  Conversion is made from liberfa sources:
- *  https://github.com/liberfa/erfa
- *
- *+----------------------------------------------------------------------
- *  THIS WORK IS RELEASED UNDER THE SAME TERMS AS ERFA:
- *+----------------------------------------------------------------------
- *
- *  Copyright (C) 2013-2014, NumFOCUS Foundation.
- *  All rights reserved.
- *  
- *  This library is derived, with permission, from the International
- *  Astronomical Union's "Standards of Fundamental Astronomy" library,
- *  available from http://www.iausofa.org.
- *  
- *  The ERFA version is intended to retain identical
- *  functionality to the SOFA library, but made distinct through
- *  different function and file names, as set out in the SOFA license
- *  conditions. The SOFA original has a role as a reference standard
- *  for the IAU and IERS, and consequently redistribution is permitted only
- *  in its unaltered state. The ERFA version is not subject to this
- *  restriction and therefore can be included in distributions which do not
- *  support the concept of "read only" software.
- *  
- *  Although the intent is to replicate the SOFA API (other than replacement of
- *  prefix names) and results (with the exception of bugs; any that are
- *  discovered will be fixed), SOFA is not responsible for any errors found
- *  in this version of the library.
- *  
- *  If you wish to acknowledge the SOFA heritage, please acknowledge that
- *  you are using a library derived from SOFA, rather than SOFA itself.
- *  
- *  
- *  TERMS AND CONDITIONS
- *  
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions are met:
- *  
- *  1 Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  
- *  2 Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  
- *  3 Neither the name of the Standards Of Fundamental Astronomy Board, the
- *     International Astronomical Union nor the names of its contributors
- *     may be used to endorse or promote products derived from this software
- *     without specific prior written permission.
- *  
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
- *  IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- *  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- *  PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- *  HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- *  TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- *  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- *  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *-----------------------------------------------------------------------
-*/
 ;
 function eraObl06(date1, date2)
-/*
-**  - - - - - - - - -
-**   e r a O b l 0 6
-**  - - - - - - - - -
-**
-**  Mean obliquity of the ecliptic, IAU 2006 precession model.
-**
-**  Given:
-**     date1,date2  double   TT as a 2-part Julian Date (Note 1)
-**
-**  Returned (function value):
-**                  double   obliquity of the ecliptic (radians, Note 2)
-**
-**  Notes:
-**
-**  1) The TT date date1+date2 is a Julian Date, apportioned in any
-**     convenient way between the two arguments.  For example,
-**     JD(TT)=2450123.7 could be expressed in any of these ways,
-**     among others:
-**
-**            date1          date2
-**
-**         2450123.7           0.0       (JD method)
-**         2451545.0       -1421.3       (J2000 method)
-**         2400000.5       50123.2       (MJD method)
-**         2450123.5           0.2       (date & time method)
-**
-**     The JD method is the most natural and convenient to use in
-**     cases where the loss of several decimal digits of resolution
-**     is acceptable.  The J2000 method is best matched to the way
-**     the argument is handled internally and will deliver the
-**     optimum resolution.  The MJD method and the date & time methods
-**     are both good compromises between resolution and convenience.
-**
-**  2) The result is the angle between the ecliptic and mean equator of
-**     date date1+date2.
-**
-**  Reference:
-**
-**     Hilton, J. et al., 2006, Celest.Mech.Dyn.Astron. 94, 351
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var t, eps0;
 
@@ -2456,98 +612,8 @@ function eraObl06(date1, date2)
    return eps0;
 
 }
-/*
- *+----------------------------------------------------------------------
- *
- *  ERFA/SOFA functions converted to JS
- *  Copyright (C) 2020 by Marcel Greter
- *  http:://www.github.com/mgreter/sofa.js
- *
- *  The conversion is done by a custom hacked perl script.
- *  Automatically generates QUnit tests for all functions.
- *
- *  Conversion is made from liberfa sources:
- *  https://github.com/liberfa/erfa
- *
- *+----------------------------------------------------------------------
- *  THIS WORK IS RELEASED UNDER THE SAME TERMS AS ERFA:
- *+----------------------------------------------------------------------
- *
- *  Copyright (C) 2013-2014, NumFOCUS Foundation.
- *  All rights reserved.
- *  
- *  This library is derived, with permission, from the International
- *  Astronomical Union's "Standards of Fundamental Astronomy" library,
- *  available from http://www.iausofa.org.
- *  
- *  The ERFA version is intended to retain identical
- *  functionality to the SOFA library, but made distinct through
- *  different function and file names, as set out in the SOFA license
- *  conditions. The SOFA original has a role as a reference standard
- *  for the IAU and IERS, and consequently redistribution is permitted only
- *  in its unaltered state. The ERFA version is not subject to this
- *  restriction and therefore can be included in distributions which do not
- *  support the concept of "read only" software.
- *  
- *  Although the intent is to replicate the SOFA API (other than replacement of
- *  prefix names) and results (with the exception of bugs; any that are
- *  discovered will be fixed), SOFA is not responsible for any errors found
- *  in this version of the library.
- *  
- *  If you wish to acknowledge the SOFA heritage, please acknowledge that
- *  you are using a library derived from SOFA, rather than SOFA itself.
- *  
- *  
- *  TERMS AND CONDITIONS
- *  
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions are met:
- *  
- *  1 Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  
- *  2 Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  
- *  3 Neither the name of the Standards Of Fundamental Astronomy Board, the
- *     International Astronomical Union nor the names of its contributors
- *     may be used to endorse or promote products derived from this software
- *     without specific prior written permission.
- *  
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
- *  IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- *  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- *  PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- *  HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- *  TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- *  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- *  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *-----------------------------------------------------------------------
-*/
 ;
 function eraPdp(a, b)
-/*
-**  - - - - - - -
-**   e r a P d p
-**  - - - - - - -
-**
-**  p-vector inner (=scalar=dot) product.
-**
-**  Given:
-**     a      double[3]     first p-vector
-**     b      double[3]     second p-vector
-**
-**  Returned (function value):
-**            double        a . b
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var w;
 
@@ -2559,155 +625,8 @@ function eraPdp(a, b)
    return w;
 
 }
-/*
- *+----------------------------------------------------------------------
- *
- *  ERFA/SOFA functions converted to JS
- *  Copyright (C) 2020 by Marcel Greter
- *  http:://www.github.com/mgreter/sofa.js
- *
- *  The conversion is done by a custom hacked perl script.
- *  Automatically generates QUnit tests for all functions.
- *
- *  Conversion is made from liberfa sources:
- *  https://github.com/liberfa/erfa
- *
- *+----------------------------------------------------------------------
- *  THIS WORK IS RELEASED UNDER THE SAME TERMS AS ERFA:
- *+----------------------------------------------------------------------
- *
- *  Copyright (C) 2013-2014, NumFOCUS Foundation.
- *  All rights reserved.
- *  
- *  This library is derived, with permission, from the International
- *  Astronomical Union's "Standards of Fundamental Astronomy" library,
- *  available from http://www.iausofa.org.
- *  
- *  The ERFA version is intended to retain identical
- *  functionality to the SOFA library, but made distinct through
- *  different function and file names, as set out in the SOFA license
- *  conditions. The SOFA original has a role as a reference standard
- *  for the IAU and IERS, and consequently redistribution is permitted only
- *  in its unaltered state. The ERFA version is not subject to this
- *  restriction and therefore can be included in distributions which do not
- *  support the concept of "read only" software.
- *  
- *  Although the intent is to replicate the SOFA API (other than replacement of
- *  prefix names) and results (with the exception of bugs; any that are
- *  discovered will be fixed), SOFA is not responsible for any errors found
- *  in this version of the library.
- *  
- *  If you wish to acknowledge the SOFA heritage, please acknowledge that
- *  you are using a library derived from SOFA, rather than SOFA itself.
- *  
- *  
- *  TERMS AND CONDITIONS
- *  
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions are met:
- *  
- *  1 Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  
- *  2 Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  
- *  3 Neither the name of the Standards Of Fundamental Astronomy Board, the
- *     International Astronomical Union nor the names of its contributors
- *     may be used to endorse or promote products derived from this software
- *     without specific prior written permission.
- *  
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
- *  IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- *  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- *  PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- *  HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- *  TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- *  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- *  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *-----------------------------------------------------------------------
-*/
 ;
 function eraPfw06(date1, date2)
-/*
-**  - - - - - - - - -
-**   e r a P f w 0 6
-**  - - - - - - - - -
-**
-**  Precession angles, IAU 2006 (Fukushima-Williams 4-angle formulation).
-**
-**  Given:
-**     date1,date2  double   TT as a 2-part Julian Date (Note 1)
-**
-**  Returned:
-**     gamb         double   F-W angle gamma_bar (radians)
-**     phib         double   F-W angle phi_bar (radians)
-**     psib         double   F-W angle psi_bar (radians)
-**     epsa         double   F-W angle epsilon_A (radians)
-**
-**  Notes:
-**
-**  1) The TT date date1+date2 is a Julian Date, apportioned in any
-**     convenient way between the two arguments.  For example,
-**     JD(TT)=2450123.7 could be expressed in any of these ways,
-**     among others:
-**
-**            date1          date2
-**
-**         2450123.7           0.0       (JD method)
-**         2451545.0       -1421.3       (J2000 method)
-**         2400000.5       50123.2       (MJD method)
-**         2450123.5           0.2       (date & time method)
-**
-**     The JD method is the most natural and convenient to use in
-**     cases where the loss of several decimal digits of resolution
-**     is acceptable.  The J2000 method is best matched to the way
-**     the argument is handled internally and will deliver the
-**     optimum resolution.  The MJD method and the date & time methods
-**     are both good compromises between resolution and convenience.
-**
-**  2) Naming the following points:
-**
-**           e = J2000.0 ecliptic pole,
-**           p = GCRS pole,
-**           E = mean ecliptic pole of date,
-**     and   P = mean pole of date,
-**
-**     the four Fukushima-Williams angles are as follows:
-**
-**        gamb = gamma_bar = epE
-**        phib = phi_bar = pE
-**        psib = psi_bar = pEP
-**        epsa = epsilon_A = EP
-**
-**  3) The matrix representing the combined effects of frame bias and
-**     precession is:
-**
-**        PxB = R_1(-epsa).R_3(-psib).R_1(phib).R_3(gamb)
-**
-**  4) The matrix representing the combined effects of frame bias,
-**     precession and nutation is simply:
-**
-**        NxPxB = R_1(-epsa-dE).R_3(-psib-dP).R_1(phib).R_3(gamb)
-**
-**     where dP and dE are the nutation components with respect to the
-**     ecliptic of date.
-**
-**  Reference:
-**
-**     Hilton, J. et al., 2006, Celest.Mech.Dyn.Astron. 94, 351
-**
-**  Called:
-**     eraObl06     mean obliquity, IAU 2006
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var gamb = 0.0;;
    var phib = 0.0;;
@@ -2748,133 +667,8 @@ function eraPfw06(date1, date2)
    return [gamb, phib, psib, epsa];
 
 }
-/*
- *+----------------------------------------------------------------------
- *
- *  ERFA/SOFA functions converted to JS
- *  Copyright (C) 2020 by Marcel Greter
- *  http:://www.github.com/mgreter/sofa.js
- *
- *  The conversion is done by a custom hacked perl script.
- *  Automatically generates QUnit tests for all functions.
- *
- *  Conversion is made from liberfa sources:
- *  https://github.com/liberfa/erfa
- *
- *+----------------------------------------------------------------------
- *  THIS WORK IS RELEASED UNDER THE SAME TERMS AS ERFA:
- *+----------------------------------------------------------------------
- *
- *  Copyright (C) 2013-2014, NumFOCUS Foundation.
- *  All rights reserved.
- *  
- *  This library is derived, with permission, from the International
- *  Astronomical Union's "Standards of Fundamental Astronomy" library,
- *  available from http://www.iausofa.org.
- *  
- *  The ERFA version is intended to retain identical
- *  functionality to the SOFA library, but made distinct through
- *  different function and file names, as set out in the SOFA license
- *  conditions. The SOFA original has a role as a reference standard
- *  for the IAU and IERS, and consequently redistribution is permitted only
- *  in its unaltered state. The ERFA version is not subject to this
- *  restriction and therefore can be included in distributions which do not
- *  support the concept of "read only" software.
- *  
- *  Although the intent is to replicate the SOFA API (other than replacement of
- *  prefix names) and results (with the exception of bugs; any that are
- *  discovered will be fixed), SOFA is not responsible for any errors found
- *  in this version of the library.
- *  
- *  If you wish to acknowledge the SOFA heritage, please acknowledge that
- *  you are using a library derived from SOFA, rather than SOFA itself.
- *  
- *  
- *  TERMS AND CONDITIONS
- *  
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions are met:
- *  
- *  1 Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  
- *  2 Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  
- *  3 Neither the name of the Standards Of Fundamental Astronomy Board, the
- *     International Astronomical Union nor the names of its contributors
- *     may be used to endorse or promote products derived from this software
- *     without specific prior written permission.
- *  
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
- *  IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- *  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- *  PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- *  HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- *  TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- *  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- *  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *-----------------------------------------------------------------------
-*/
 ;
 function eraPnm06a(date1, date2)
-/*
-**  - - - - - - - - - -
-**   e r a P n m 0 6 a
-**  - - - - - - - - - -
-**
-**  Form the matrix of precession-nutation for a given date (including
-**  frame bias), IAU 2006 precession and IAU 2000A nutation models.
-**
-**  Given:
-**     date1,date2 double       TT as a 2-part Julian Date (Note 1)
-**
-**  Returned:
-**     rnpb        double[3][3] bias-precession-nutation matrix (Note 2)
-**
-**  Notes:
-**
-**  1) The TT date date1+date2 is a Julian Date, apportioned in any
-**     convenient way between the two arguments.  For example,
-**     JD(TT)=2450123.7 could be expressed in any of these ways,
-**     among others:
-**
-**            date1          date2
-**
-**         2450123.7           0.0       (JD method)
-**         2451545.0       -1421.3       (J2000 method)
-**         2400000.5       50123.2       (MJD method)
-**         2450123.5           0.2       (date & time method)
-**
-**     The JD method is the most natural and convenient to use in
-**     cases where the loss of several decimal digits of resolution
-**     is acceptable.  The J2000 method is best matched to the way
-**     the argument is handled internally and will deliver the
-**     optimum resolution.  The MJD method and the date & time methods
-**     are both good compromises between resolution and convenience.
-**
-**  2) The matrix operates in the sense V(date) = rnpb * V(GCRS), where
-**     the p-vector V(date) is with respect to the true equatorial triad
-**     of date date1+date2 and the p-vector V(GCRS) is with respect to
-**     the Geocentric Celestial Reference System (IAU, 2000).
-**
-**  Called:
-**     eraPfw06     bias-precession F-W angles, IAU 2006
-**     eraNut06a    nutation, IAU 2006/2000A
-**     eraFw2m      F-W angles to r-matrix
-**
-**  Reference:
-**
-**     Capitaine, N. & Wallace, P.T., 2006, Astron.Astrophys. 450, 855.
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var rnpb = [ [0,0,0], [0,0,0], [0,0,0] ];;
    if (typeof rnpb == 'undefined') {
@@ -2902,129 +696,8 @@ function eraPnm06a(date1, date2)
    return rnpb;
 
 }
-/*
- *+----------------------------------------------------------------------
- *
- *  ERFA/SOFA functions converted to JS
- *  Copyright (C) 2020 by Marcel Greter
- *  http:://www.github.com/mgreter/sofa.js
- *
- *  The conversion is done by a custom hacked perl script.
- *  Automatically generates QUnit tests for all functions.
- *
- *  Conversion is made from liberfa sources:
- *  https://github.com/liberfa/erfa
- *
- *+----------------------------------------------------------------------
- *  THIS WORK IS RELEASED UNDER THE SAME TERMS AS ERFA:
- *+----------------------------------------------------------------------
- *
- *  Copyright (C) 2013-2014, NumFOCUS Foundation.
- *  All rights reserved.
- *  
- *  This library is derived, with permission, from the International
- *  Astronomical Union's "Standards of Fundamental Astronomy" library,
- *  available from http://www.iausofa.org.
- *  
- *  The ERFA version is intended to retain identical
- *  functionality to the SOFA library, but made distinct through
- *  different function and file names, as set out in the SOFA license
- *  conditions. The SOFA original has a role as a reference standard
- *  for the IAU and IERS, and consequently redistribution is permitted only
- *  in its unaltered state. The ERFA version is not subject to this
- *  restriction and therefore can be included in distributions which do not
- *  support the concept of "read only" software.
- *  
- *  Although the intent is to replicate the SOFA API (other than replacement of
- *  prefix names) and results (with the exception of bugs; any that are
- *  discovered will be fixed), SOFA is not responsible for any errors found
- *  in this version of the library.
- *  
- *  If you wish to acknowledge the SOFA heritage, please acknowledge that
- *  you are using a library derived from SOFA, rather than SOFA itself.
- *  
- *  
- *  TERMS AND CONDITIONS
- *  
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions are met:
- *  
- *  1 Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  
- *  2 Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  
- *  3 Neither the name of the Standards Of Fundamental Astronomy Board, the
- *     International Astronomical Union nor the names of its contributors
- *     may be used to endorse or promote products derived from this software
- *     without specific prior written permission.
- *  
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
- *  IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- *  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- *  PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- *  HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- *  TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- *  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- *  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *-----------------------------------------------------------------------
-*/
 ;
 function eraPom00(xp, yp, sp)
-/*
-**  - - - - - - - - - -
-**   e r a P o m 0 0
-**  - - - - - - - - - -
-**
-**  Form the matrix of polar motion for a given date, IAU 2000.
-**
-**  Given:
-**     xp,yp    double    coordinates of the pole (radians, Note 1)
-**     sp       double    the TIO locator s' (radians, Note 2)
-**
-**  Returned:
-**     rpom     double[3][3]   polar-motion matrix (Note 3)
-**
-**  Notes:
-**
-**  1) The arguments xp and yp are the coordinates (in radians) of the
-**     Celestial Intermediate Pole with respect to the International
-**     Terrestrial Reference System (see IERS Conventions 2003),
-**     measured along the meridians to 0 and 90 deg west respectively.
-**
-**  2) The argument sp is the TIO locator s', in radians, which
-**     positions the Terrestrial Intermediate Origin on the equator.  It
-**     is obtained from polar motion observations by numerical
-**     integration, and so is in essence unpredictable.  However, it is
-**     dominated by a secular drift of about 47 microarcseconds per
-**     century, and so can be taken into account by using s' = -47*t,
-**     where t is centuries since J2000.0.  The function eraSp00
-**     implements this approximation.
-**
-**  3) The matrix operates in the sense V(TRS) = rpom * V(CIP), meaning
-**     that it is the final rotation when computing the pointing
-**     direction to a celestial source.
-**
-**  Called:
-**     eraIr        initialize r-matrix to identity
-**     eraRz        rotate around Z-axis
-**     eraRy        rotate around Y-axis
-**     eraRx        rotate around X-axis
-**
-**  Reference:
-**
-**     McCarthy, D. D., Petit, G. (eds.), IERS Conventions (2003),
-**     IERS Technical Note No. 32, BKG (2004)
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var rpom = [ [0,0,0], [0,0,0], [0,0,0] ];;
    if (typeof rpom == 'undefined') {
@@ -3040,142 +713,8 @@ function eraPom00(xp, yp, sp)
    return rpom;
 
 }
-/*
- *+----------------------------------------------------------------------
- *
- *  ERFA/SOFA functions converted to JS
- *  Copyright (C) 2020 by Marcel Greter
- *  http:://www.github.com/mgreter/sofa.js
- *
- *  The conversion is done by a custom hacked perl script.
- *  Automatically generates QUnit tests for all functions.
- *
- *  Conversion is made from liberfa sources:
- *  https://github.com/liberfa/erfa
- *
- *+----------------------------------------------------------------------
- *  THIS WORK IS RELEASED UNDER THE SAME TERMS AS ERFA:
- *+----------------------------------------------------------------------
- *
- *  Copyright (C) 2013-2014, NumFOCUS Foundation.
- *  All rights reserved.
- *  
- *  This library is derived, with permission, from the International
- *  Astronomical Union's "Standards of Fundamental Astronomy" library,
- *  available from http://www.iausofa.org.
- *  
- *  The ERFA version is intended to retain identical
- *  functionality to the SOFA library, but made distinct through
- *  different function and file names, as set out in the SOFA license
- *  conditions. The SOFA original has a role as a reference standard
- *  for the IAU and IERS, and consequently redistribution is permitted only
- *  in its unaltered state. The ERFA version is not subject to this
- *  restriction and therefore can be included in distributions which do not
- *  support the concept of "read only" software.
- *  
- *  Although the intent is to replicate the SOFA API (other than replacement of
- *  prefix names) and results (with the exception of bugs; any that are
- *  discovered will be fixed), SOFA is not responsible for any errors found
- *  in this version of the library.
- *  
- *  If you wish to acknowledge the SOFA heritage, please acknowledge that
- *  you are using a library derived from SOFA, rather than SOFA itself.
- *  
- *  
- *  TERMS AND CONDITIONS
- *  
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions are met:
- *  
- *  1 Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  
- *  2 Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  
- *  3 Neither the name of the Standards Of Fundamental Astronomy Board, the
- *     International Astronomical Union nor the names of its contributors
- *     may be used to endorse or promote products derived from this software
- *     without specific prior written permission.
- *  
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
- *  IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- *  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- *  PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- *  HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- *  TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- *  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- *  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *-----------------------------------------------------------------------
-*/
 ;
 function eraPvtob(elong, phi, hm, xp, yp, sp, theta)
-/*
-**  - - - - - - - - -
-**   e r a P v t o b
-**  - - - - - - - - -
-**
-**  Position and velocity of a terrestrial observing station.
-**
-**  Given:
-**     elong   double       longitude (radians, east +ve, Note 1)
-**     phi     double       latitude (geodetic, radians, Note 1)
-**     hm      double       height above ref. ellipsoid (geodetic, m)
-**     xp,yp   double       coordinates of the pole (radians, Note 2)
-**     sp      double       the TIO locator s' (radians, Note 2)
-**     theta   double       Earth rotation angle (radians, Note 3)
-**
-**  Returned:
-**     pv      double[2][3] position/velocity vector (m, m/s, CIRS)
-**
-**  Notes:
-**
-**  1) The terrestrial coordinates are with respect to the ERFA_WGS84
-**     reference ellipsoid.
-**
-**  2) xp and yp are the coordinates (in radians) of the Celestial
-**     Intermediate Pole with respect to the International Terrestrial
-**     Reference System (see IERS Conventions), measured along the
-**     meridians 0 and 90 deg west respectively.  sp is the TIO locator
-**     s', in radians, which positions the Terrestrial Intermediate
-**     Origin on the equator.  For many applications, xp, yp and
-**     (especially) sp can be set to zero.
-**
-**  3) If theta is Greenwich apparent sidereal time instead of Earth
-**     rotation angle, the result is with respect to the true equator
-**     and equinox of date, i.e. with the x-axis at the equinox rather
-**     than the celestial intermediate origin.
-**
-**  4) The velocity units are meters per UT1 second, not per SI second.
-**     This is unlikely to have any practical consequences in the modern
-**     era.
-**
-**  5) No validation is performed on the arguments.  Error cases that
-**     could lead to arithmetic exceptions are trapped by the eraGd2gc
-**     function, and the result set to zeros.
-**
-**  References:
-**
-**     McCarthy, D. D., Petit, G. (eds.), IERS Conventions (2003),
-**     IERS Technical Note No. 32, BKG (2004)
-**
-**     Urban, S. & Seidelmann, P. K. (eds), Explanatory Supplement to
-**     the Astronomical Almanac, 3rd ed., University Science Books
-**     (2013), Section 7.4.3.3.
-**
-**  Called:
-**     eraGd2gc     geodetic to geocentric transformation
-**     eraPom00     polar motion matrix
-**     eraTrxp      product of transpose of r-matrix and p-vector
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var pv = [ [0,0,0], [0,0,0] ];;
    var _rv1;
@@ -3216,36 +755,6 @@ function eraPvtob(elong, phi, hm, xp, yp, sp, theta)
 return pv;
 };
 function eraRx(phi, r)
-/*
-**  - - - - - -
-**   e r a R x
-**  - - - - - -
-**
-**  Rotate an r-matrix about the x-axis.
-**
-**  Given:
-**     phi    double          angle (radians)
-**
-**  Given and returned:
-**     r      double[3][3]    r-matrix, rotated
-**
-**  Notes:
-**
-**  1) Calling this function with positive phi incorporates in the
-**     supplied r-matrix r an additional rotation, about the x-axis,
-**     anticlockwise as seen looking towards the origin from positive x.
-**
-**  2) The additional rotation can be represented by this matrix:
-**
-**         (  1        0            0      )
-**         (                               )
-**         (  0   + cos(phi)   + sin(phi)  )
-**         (                               )
-**         (  0   - sin(phi)   + cos(phi)  )
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    if (typeof r == 'undefined') {
       r = [ [0,0,0], [0,0,0], [0,0,0] ];
@@ -3275,36 +784,6 @@ function eraRx(phi, r)
 
 };
 function eraRy(theta, r)
-/*
-**  - - - - - -
-**   e r a R y
-**  - - - - - -
-**
-**  Rotate an r-matrix about the y-axis.
-**
-**  Given:
-**     theta  double          angle (radians)
-**
-**  Given and returned:
-**     r      double[3][3]    r-matrix, rotated
-**
-**  Notes:
-**
-**  1) Calling this function with positive theta incorporates in the
-**     supplied r-matrix r an additional rotation, about the y-axis,
-**     anticlockwise as seen looking towards the origin from positive y.
-**
-**  2) The additional rotation can be represented by this matrix:
-**
-**         (  + cos(theta)     0      - sin(theta)  )
-**         (                                        )
-**         (       0           1           0        )
-**         (                                        )
-**         (  + sin(theta)     0      + cos(theta)  )
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    if (typeof r == 'undefined') {
       r = [ [0,0,0], [0,0,0], [0,0,0] ];
@@ -3334,36 +813,6 @@ function eraRy(theta, r)
 
 };
 function eraRz(psi, r)
-/*
-**  - - - - - -
-**   e r a R z
-**  - - - - - -
-**
-**  Rotate an r-matrix about the z-axis.
-**
-**  Given:
-**     psi    double          angle (radians)
-**
-**  Given and returned:
-**     r      double[3][3]    r-matrix, rotated
-**
-**  Notes:
-**
-**  1) Calling this function with positive psi incorporates in the
-**     supplied r-matrix r an additional rotation, about the z-axis,
-**     anticlockwise as seen looking towards the origin from positive z.
-**
-**  2) The additional rotation can be represented by this matrix:
-**
-**         (  + cos(psi)   + sin(psi)     0  )
-**         (                                 )
-**         (  - sin(psi)   + cos(psi)     0  )
-**         (                                 )
-**         (       0            0         1  )
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    if (typeof r == 'undefined') {
       r = [ [0,0,0], [0,0,0], [0,0,0] ];
@@ -3393,41 +842,6 @@ function eraRz(psi, r)
 
 };
 function eraTaitt(tai1, tai2)
-/*
-**  - - - - - - - - -
-**   e r a T a i t t
-**  - - - - - - - - -
-**
-**  Time scale transformation:  International Atomic Time, TAI, to
-**  Terrestrial Time, TT.
-**
-**  Given:
-**     tai1,tai2  double    TAI as a 2-part Julian Date
-**
-**  Returned:
-**     tt1,tt2    double    TT as a 2-part Julian Date
-**
-**  Returned (function value):
-**                int       status:  0 = OK
-**
-**  Note:
-**
-**     tai1+tai2 is Julian Date, apportioned in any convenient way
-**     between the two arguments, for example where tai1 is the Julian
-**     Day Number and tai2 is the fraction of a day.  The returned
-**     tt1,tt2 follow suit.
-**
-**  References:
-**
-**     McCarthy, D. D., Petit, G. (eds.), IERS Conventions (2003),
-**     IERS Technical Note No. 32, BKG (2004)
-**
-**     Explanatory Supplement to the Astronomical Almanac,
-**     P. Kenneth Seidelmann (ed), University Science Books (1992)
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var tt1 = 0.0;;
    var tt2 = 0.0;;
@@ -3451,42 +865,6 @@ function eraTaitt(tai1, tai2)
 
 };
 function eraTaiut1(tai1, tai2, dta)
-/*
-**  - - - - - - - - - -
-**   e r a T a i u t 1
-**  - - - - - - - - - -
-**
-**  Time scale transformation:  International Atomic Time, TAI, to
-**  Universal Time, UT1.
-**
-**  Given:
-**     tai1,tai2  double    TAI as a 2-part Julian Date
-**     dta        double    UT1-TAI in seconds
-**
-**  Returned:
-**     ut11,ut12  double    UT1 as a 2-part Julian Date
-**
-**  Returned (function value):
-**                int       status:  0 = OK
-**
-**  Notes:
-**
-**  1) tai1+tai2 is Julian Date, apportioned in any convenient way
-**     between the two arguments, for example where tai1 is the Julian
-**     Day Number and tai2 is the fraction of a day.  The returned
-**     UT11,UT12 follow suit.
-**
-**  2) The argument dta, i.e. UT1-TAI, is an observed quantity, and is
-**     available from IERS tabulations.
-**
-**  Reference:
-**
-**     Explanatory Supplement to the Astronomical Almanac,
-**     P. Kenneth Seidelmann (ed), University Science Books (1992)
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var ut11 = 0.0;;
    var ut12 = 0.0;;
@@ -3510,28 +888,6 @@ function eraTaiut1(tai1, tai2, dta)
 
 };
 function eraTr(r)
-/*
-**  - - - - - -
-**   e r a T r
-**  - - - - - -
-**
-**  Transpose an r-matrix.
-**
-**  Given:
-**     r        double[3][3]    r-matrix
-**
-**  Returned:
-**     rt       double[3][3]    transpose
-**
-**  Note:
-**     It is permissible for r and rt to be the same array.
-**
-**  Called:
-**     eraCr        copy r-matrix
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var rt = [ [0,0,0], [0,0,0], [0,0,0] ];;
    if (typeof rt == 'undefined') {
@@ -3553,30 +909,6 @@ function eraTr(r)
 
 };
 function eraTrxp(r, p)
-/*
-**  - - - - - - - -
-**   e r a T r x p
-**  - - - - - - - -
-**
-**  Multiply a p-vector by the transpose of an r-matrix.
-**
-**  Given:
-**     r        double[3][3]   r-matrix
-**     p        double[3]      p-vector
-**
-**  Returned:
-**     trp      double[3]      r * p
-**
-**  Note:
-**     It is permissible for p and trp to be the same array.
-**
-**  Called:
-**     eraTr        transpose r-matrix
-**     eraRxp       product of r-matrix and p-vector
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var trp = [0, 0, 0];;
 
@@ -3595,66 +927,6 @@ function eraTrxp(r, p)
 }
 ;
 function eraUtctai(utc1, utc2)
-/*
-**  - - - - - - - - - -
-**   e r a U t c t a i
-**  - - - - - - - - - -
-**
-**  Time scale transformation:  Coordinated Universal Time, UTC, to
-**  International Atomic Time, TAI.
-**
-**  Given:
-**     utc1,utc2  double   UTC as a 2-part quasi Julian Date (Notes 1-4)
-**
-**  Returned:
-**     tai1,tai2  double   TAI as a 2-part Julian Date (Note 5)
-**
-**  Returned (function value):
-**                int      status: +1 = dubious year (Note 3)
-**                                  0 = OK
-**                                 -1 = unacceptable date
-**
-**  Notes:
-**
-**  1) utc1+utc2 is quasi Julian Date (see Note 2), apportioned in any
-**     convenient way between the two arguments, for example where utc1
-**     is the Julian Day Number and utc2 is the fraction of a day.
-**
-**  2) JD cannot unambiguously represent UTC during a leap second unless
-**     special measures are taken.  The convention in the present
-**     function is that the JD day represents UTC days whether the
-**     length is 86399, 86400 or 86401 SI seconds.  In the 1960-1972 era
-**     there were smaller jumps (in either direction) each time the
-**     linear UTC(TAI) expression was changed, and these "mini-leaps"
-**     are also included in the ERFA convention.
-**
-**  3) The warning status "dubious year" flags UTCs that predate the
-**     introduction of the time scale or that are too far in the future
-**     to be trusted.  See eraDat for further details.
-**
-**  4) The function eraDtf2d converts from calendar date and time of day
-**     into 2-part Julian Date, and in the case of UTC implements the
-**     leap-second-ambiguity convention described above.
-**
-**  5) The returned TAI1,TAI2 are such that their sum is the TAI Julian
-**     Date.
-**
-**  Called:
-**     eraJd2cal    JD to Gregorian calendar
-**     eraDat       delta(AT) = TAI-UTC
-**     eraCal2jd    Gregorian calendar to JD
-**
-**  References:
-**
-**     McCarthy, D. D., Petit, G. (eds.), IERS Conventions (2003),
-**     IERS Technical Note No. 32, BKG (2004)
-**
-**     Explanatory Supplement to the Astronomical Almanac,
-**     P. Kenneth Seidelmann (ed), University Science Books (1992)
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var tai1 = 0.0;;
    var tai2 = 0.0;;
@@ -3736,70 +1008,6 @@ function eraUtctai(utc1, utc2)
 }
 ;
 function eraUtcut1(utc1, utc2, dut1)
-/*
-**  - - - - - - - - - -
-**   e r a U t c u t 1
-**  - - - - - - - - - -
-**
-**  Time scale transformation:  Coordinated Universal Time, UTC, to
-**  Universal Time, UT1.
-**
-**  Given:
-**     utc1,utc2  double   UTC as a 2-part quasi Julian Date (Notes 1-4)
-**     dut1       double   Delta UT1 = UT1-UTC in seconds (Note 5)
-**
-**  Returned:
-**     ut11,ut12  double   UT1 as a 2-part Julian Date (Note 6)
-**
-**  Returned (function value):
-**                int      status: +1 = dubious year (Note 3)
-**                                  0 = OK
-**                                 -1 = unacceptable date
-**
-**  Notes:
-**
-**  1) utc1+utc2 is quasi Julian Date (see Note 2), apportioned in any
-**     convenient way between the two arguments, for example where utc1
-**     is the Julian Day Number and utc2 is the fraction of a day.
-**
-**  2) JD cannot unambiguously represent UTC during a leap second unless
-**     special measures are taken.  The convention in the present
-**     function is that the JD day represents UTC days whether the
-**     length is 86399, 86400 or 86401 SI seconds.
-**
-**  3) The warning status "dubious year" flags UTCs that predate the
-**     introduction of the time scale or that are too far in the future
-**     to be trusted.  See eraDat for further details.
-**
-**  4) The function eraDtf2d converts from calendar date and time of
-**     day into 2-part Julian Date, and in the case of UTC implements
-**     the leap-second-ambiguity convention described above.
-**
-**  5) Delta UT1 can be obtained from tabulations provided by the
-**     International Earth Rotation and Reference Systems Service.
-**     It is the caller's responsibility to supply a dut1 argument
-**     containing the UT1-UTC value that matches the given UTC.
-**
-**  6) The returned ut11,ut12 are such that their sum is the UT1 Julian
-**     Date.
-**
-**  References:
-**
-**     McCarthy, D. D., Petit, G. (eds.), IERS Conventions (2003),
-**     IERS Technical Note No. 32, BKG (2004)
-**
-**     Explanatory Supplement to the Astronomical Almanac,
-**     P. Kenneth Seidelmann (ed), University Science Books (1992)
-**
-**  Called:
-**     eraJd2cal    JD to Gregorian calendar
-**     eraDat       delta(AT) = TAI-UTC
-**     eraUtctai    UTC to TAI
-**     eraTaiut1    TAI to UT1
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var ut11 = 0.0;;
    var ut12 = 0.0;;
@@ -3843,19 +1051,6 @@ function eraUtcut1(utc1, utc2, dut1)
 }
 ;
 function eraZp(p)
-/*
-**  - - - - - -
-**   e r a Z p
-**  - - - - - -
-**
-**  Zero a p-vector.
-**
-**  Returned:
-**     p        double[3]      p-vector
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    if (typeof p == 'undefined') {
       p = [0, 0, 0];
@@ -3870,77 +1065,6 @@ function eraZp(p)
 }
 ;
 function eraGst00a(uta, utb, tta, ttb)
-/*
-**  - - - - - - - - - -
-**   e r a G s t 0 0 a
-**  - - - - - - - - - -
-**
-**  Greenwich apparent sidereal time (consistent with IAU 2000
-**  resolutions).
-**
-**  Given:
-**     uta,utb    double    UT1 as a 2-part Julian Date (Notes 1,2)
-**     tta,ttb    double    TT as a 2-part Julian Date (Notes 1,2)
-**
-**  Returned (function value):
-**                double    Greenwich apparent sidereal time (radians)
-**
-**  Notes:
-**
-**  1) The UT1 and TT dates uta+utb and tta+ttb respectively, are both
-**     Julian Dates, apportioned in any convenient way between the
-**     argument pairs.  For example, JD=2450123.7 could be expressed in
-**     any of these ways, among others:
-**
-**            Part A        Part B
-**
-**         2450123.7           0.0       (JD method)
-**         2451545.0       -1421.3       (J2000 method)
-**         2400000.5       50123.2       (MJD method)
-**         2450123.5           0.2       (date & time method)
-**
-**     The JD method is the most natural and convenient to use in
-**     cases where the loss of several decimal digits of resolution
-**     is acceptable (in the case of UT;  the TT is not at all critical
-**     in this respect).  The J2000 and MJD methods are good compromises
-**     between resolution and convenience.  For UT, the date & time
-**     method is best matched to the algorithm that is used by the Earth
-**     Rotation Angle function, called internally:  maximum precision is
-**     delivered when the uta argument is for 0hrs UT1 on the day in
-**     question and the utb argument lies in the range 0 to 1, or vice
-**     versa.
-**
-**  2) Both UT1 and TT are required, UT1 to predict the Earth rotation
-**     and TT to predict the effects of precession-nutation.  If UT1 is
-**     used for both purposes, errors of order 100 microarcseconds
-**     result.
-**
-**  3) This GAST is compatible with the IAU 2000 resolutions and must be
-**     used only in conjunction with other IAU 2000 compatible
-**     components such as precession-nutation.
-**
-**  4) The result is returned in the range 0 to 2pi.
-**
-**  5) The algorithm is from Capitaine et al. (2003) and IERS
-**     Conventions 2003.
-**
-**  Called:
-**     eraGmst00    Greenwich mean sidereal time, IAU 2000
-**     eraEe00a     equation of the equinoxes, IAU 2000A
-**     eraAnp       normalize angle into range 0 to 2pi
-**
-**  References:
-**
-**     Capitaine, N., Wallace, P.T. and McCarthy, D.D., "Expressions to
-**     implement the IAU 2000 definition of UT1", Astronomy &
-**     Astrophysics, 406, 1135-1149 (2003)
-**
-**     McCarthy, D. D., Petit, G. (eds.), IERS Conventions (2003),
-**     IERS Technical Note No. 32, BKG (2004)
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var gmst00, ee00a, gst;
 
@@ -3955,66 +1079,6 @@ function eraGst00a(uta, utb, tta, ttb)
 ;
 
 function eraEe00a(date1, date2)
-/*
-**  - - - - - - - - -
-**   e r a E e 0 0 a
-**  - - - - - - - - -
-**
-**  Equation of the equinoxes, compatible with IAU 2000 resolutions.
-**
-**  Given:
-**     date1,date2  double    TT as a 2-part Julian Date (Note 1)
-**
-**  Returned (function value):
-**                  double    equation of the equinoxes (Note 2)
-**
-**  Notes:
-**
-**  1) The TT date date1+date2 is a Julian Date, apportioned in any
-**     convenient way between the two arguments.  For example,
-**     JD(TT)=2450123.7 could be expressed in any of these ways,
-**     among others:
-**
-**            date1          date2
-**
-**         2450123.7           0.0       (JD method)
-**         2451545.0       -1421.3       (J2000 method)
-**         2400000.5       50123.2       (MJD method)
-**         2450123.5           0.2       (date & time method)
-**
-**     The JD method is the most natural and convenient to use in
-**     cases where the loss of several decimal digits of resolution
-**     is acceptable.  The J2000 method is best matched to the way
-**     the argument is handled internally and will deliver the
-**     optimum resolution.  The MJD method and the date & time methods
-**     are both good compromises between resolution and convenience.
-**
-**  2) The result, which is in radians, operates in the following sense:
-**
-**        Greenwich apparent ST = GMST + equation of the equinoxes
-**
-**  3) The result is compatible with the IAU 2000 resolutions.  For
-**     further details, see IERS Conventions 2003 and Capitaine et al.
-**     (2002).
-**
-**  Called:
-**     eraPr00      IAU 2000 precession adjustments
-**     eraObl80     mean obliquity, IAU 1980
-**     eraNut00a    nutation, IAU 2000A
-**     eraEe00      equation of the equinoxes, IAU 2000
-**
-**  References:
-**
-**     Capitaine, N., Wallace, P.T. and McCarthy, D.D., "Expressions to
-**     implement the IAU 2000 definition of UT1", Astronomy &
-**     Astrophysics, 406, 1135-1149 (2003).
-**
-**     McCarthy, D. D., Petit, G. (eds.), IERS Conventions (2003),
-**     IERS Technical Note No. 32, BKG (2004).
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var _rv1, _rv3;
 
@@ -4042,74 +1106,6 @@ function eraEe00a(date1, date2)
 }
 ;
 function eraPr00(date1, date2)
-/*
-**  - - - - - - - -
-**   e r a P r 0 0
-**  - - - - - - - -
-**
-**  Precession-rate part of the IAU 2000 precession-nutation models
-**  (part of MHB2000).
-**
-**  Given:
-**     date1,date2    double  TT as a 2-part Julian Date (Note 1)
-**
-**  Returned:
-**     dpsipr,depspr  double  precession corrections (Notes 2,3)
-**
-**  Notes:
-**
-**  1) The TT date date1+date2 is a Julian Date, apportioned in any
-**     convenient way between the two arguments.  For example,
-**     JD(TT)=2450123.7 could be expressed in any of these ways,
-**     among others:
-**
-**            date1          date2
-**
-**         2450123.7           0.0       (JD method)
-**         2451545.0       -1421.3       (J2000 method)
-**         2400000.5       50123.2       (MJD method)
-**         2450123.5           0.2       (date & time method)
-**
-**     The JD method is the most natural and convenient to use in
-**     cases where the loss of several decimal digits of resolution
-**     is acceptable.  The J2000 method is best matched to the way
-**     the argument is handled internally and will deliver the
-**     optimum resolution.  The MJD method and the date & time methods
-**     are both good compromises between resolution and convenience.
-**
-**  2) The precession adjustments are expressed as "nutation
-**     components", corrections in longitude and obliquity with respect
-**     to the J2000.0 equinox and ecliptic.
-**
-**  3) Although the precession adjustments are stated to be with respect
-**     to Lieske et al. (1977), the MHB2000 model does not specify which
-**     set of Euler angles are to be used and how the adjustments are to
-**     be applied.  The most literal and straightforward procedure is to
-**     adopt the 4-rotation epsilon_0, psi_A, omega_A, xi_A option, and
-**     to add dpsipr to psi_A and depspr to both omega_A and eps_A.
-**
-**  4) This is an implementation of one aspect of the IAU 2000A nutation
-**     model, formally adopted by the IAU General Assembly in 2000,
-**     namely MHB2000 (Mathews et al. 2002).
-**
-**  References:
-**
-**     Lieske, J.H., Lederle, T., Fricke, W. & Morando, B., "Expressions
-**     for the precession quantities based upon the IAU (1976) System of
-**     Astronomical Constants", Astron.Astrophys., 58, 1-16 (1977)
-**
-**     Mathews, P.M., Herring, T.A., Buffet, B.A., "Modeling of nutation
-**     and precession   New nutation series for nonrigid Earth and
-**     insights into the Earth's interior", J.Geophys.Res., 107, B4,
-**     2002.  The MHB2000 code itself was obtained on 9th September 2002
-**     from ftp://maia.usno.navy.mil/conv2000/chapter5/IAU2000A.
-**
-**     Wallace, P.T., "Software for Implementing the IAU 2000
-**     Resolutions", in IERS Workshop 5.1 (2002).
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var dpsipr = 0.0;;
    var depspr = 0.0;;
@@ -4134,52 +1130,6 @@ function eraPr00(date1, date2)
 }
 ;
 function eraObl80(date1, date2)
-/*
-**  - - - - - - - - -
-**   e r a O b l 8 0
-**  - - - - - - - - -
-**
-**  Mean obliquity of the ecliptic, IAU 1980 model.
-**
-**  Given:
-**     date1,date2   double    TT as a 2-part Julian Date (Note 1)
-**
-**  Returned (function value):
-**                   double    obliquity of the ecliptic (radians, Note 2)
-**
-**  Notes:
-**
-**  1) The TT date date1+date2 is a Julian Date, apportioned in any
-**     convenient way between the two arguments.  For example,
-**     JD(TT)=2450123.7 could be expressed in any of these ways,
-**     among others:
-**
-**            date1          date2
-**
-**         2450123.7           0.0       (JD method)
-**         2451545.0       -1421.3       (J2000 method)
-**         2400000.5       50123.2       (MJD method)
-**         2450123.5           0.2       (date & time method)
-**
-**     The JD method is the most natural and convenient to use in
-**     cases where the loss of several decimal digits of resolution
-**     is acceptable.  The J2000 method is best matched to the way
-**     the argument is handled internally and will deliver the
-**     optimum resolution.  The MJD method and the date & time methods
-**     are both good compromises between resolution and convenience.
-**
-**  2) The result is the angle between the ecliptic and mean equator of
-**     date date1+date2.
-**
-**  Reference:
-**
-**     Explanatory Supplement to the Astronomical Almanac,
-**     P. Kenneth Seidelmann (ed), University Science Books (1992),
-**     Expression 3.222-1 (p114).
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var t, eps0;
 
@@ -4197,157 +1147,385 @@ function eraObl80(date1, date2)
 
 }
 ;
+
+function eraFal03(t)
+{
+   var a;
+
+
+/* Mean anomaly of the Moon (IERS Conventions 2003). */
+   a = ((485868.249036  +
+             t * ( 1717915923.2178 +
+             t * (         31.8792 +
+             t * (          0.051635 +
+             t * (        - 0.00024470 ) ) ) )) % (ERFA_TURNAS)) * ERFA_DAS2R;
+
+   return a;
+
+}
+;
+function eraFaf03(t)
+{
+   var a;
+
+
+/* Mean longitude of the Moon minus that of the ascending node */
+/* (IERS Conventions 2003).                                    */
+   a = ((335779.526232 +
+             t * ( 1739527262.8478 +
+             t * (       - 12.7512 +
+             t * (        - 0.001037 +
+             t * (          0.00000417 ) ) ) )) % (ERFA_TURNAS)) * ERFA_DAS2R;
+
+   return a;
+
+
+}
+;
+function eraFaom03(t)
+{
+   var a;
+
+
+/* Mean longitude of the Moon's ascending node */
+/* (IERS Conventions 2003).                    */
+   a = ((450160.398036 +
+             t * ( - 6962890.5431 +
+             t * (         7.4722 +
+             t * (         0.007702 +
+             t * (       - 0.00005939 ) ) ) )) % (ERFA_TURNAS)) * ERFA_DAS2R;
+
+   return a;
+
+}
+;
+function eraFapa03(t)
+{
+   var a;
+
+
+/* General accumulated precession in longitude. */
+   a = (0.024381750 + 0.00000538691 * t) * t;
+
+   return a;
+
+}
+;
+function eraFame03(t)
+{
+   var a;
+
+
+/* Mean longitude of Mercury (IERS Conventions 2003). */
+   a = ((4.402608842 + 2608.7903141574 * t) % (ERFA_D2PI));
+
+   return a;
+
+}
+;
+function eraFave03(t)
+{
+   var a;
+
+
+/* Mean longitude of Venus (IERS Conventions 2003). */
+   a = ((3.176146697 + 1021.3285546211 * t) % (ERFA_D2PI));
+
+   return a;
+
+}
+;
+function eraFae03(t)
+{
+   var a;
+
+
+/* Mean longitude of Earth (IERS Conventions 2003). */
+   a = ((1.753470314 + 628.3075849991 * t) % (ERFA_D2PI));
+
+   return a;
+
+}
+;
+function eraFama03(t)
+{
+   var a;
+
+
+/* Mean longitude of Mars (IERS Conventions 2003). */
+   a = ((6.203480913 + 334.0612426700 * t) % (ERFA_D2PI));
+
+   return a;
+
+}
+;
+function eraFaju03(t)
+{
+   var a;
+
+
+/* Mean longitude of Jupiter (IERS Conventions 2003). */
+   a = ((0.599546497 + 52.9690962641 * t) % (ERFA_D2PI));
+
+   return a;
+
+}
+;
+function eraFasa03(t)
+{
+   var a;
+
+
+/* Mean longitude of Saturn (IERS Conventions 2003). */
+   a = ((0.874016757 + 21.3299104960 * t) % (ERFA_D2PI));
+
+   return a;
+
+}
+;
+function eraFaur03(t)
+{
+   var a;
+
+
+/* Mean longitude of Uranus (IERS Conventions 2003). */
+   a = ((5.481293872 + 7.4781598567 * t) % (ERFA_D2PI));
+
+   return a;
+
+}
+;
+function eraEe00(date1, date2, epsa, dpsi)
+{
+   var ee;
+
+
+/* Equation of the equinoxes. */
+   ee = dpsi * Math.cos(epsa) + eraEect00(date1, date2);
+
+   return ee;
+
+}
+;
+function eraEect00(date1, date2)
+{
+/* Time since J2000.0, in Julian centuries */
+   var t;
+
+/* Miscellaneous */
+   var i, j;
+   var a, s0, s1;
+
+/* Fundamental arguments */
+   var fa = [];
+
+/* Returned value. */
+   var eect;
+
+/* ----------------------------------------- */
+/* The series for the EE complementary terms */
+/* ----------------------------------------- */
+
+   /* Terms of order t^0 */
+   var e0 = [
+
+   /* 1-10 */
+      [ 0,  0,  0,  0,  1,  0,  0,  0,  2640.96e-6, -0.39e-6 ],
+      [ 0,  0,  0,  0,  2,  0,  0,  0,    63.52e-6, -0.02e-6 ],
+      [ 0,  0,  2, -2,  3,  0,  0,  0,    11.75e-6,  0.01e-6 ],
+      [ 0,  0,  2, -2,  1,  0,  0,  0,    11.21e-6,  0.01e-6 ],
+      [ 0,  0,  2, -2,  2,  0,  0,  0,    -4.55e-6,  0.00e-6 ],
+      [ 0,  0,  2,  0,  3,  0,  0,  0,     2.02e-6,  0.00e-6 ],
+      [ 0,  0,  2,  0,  1,  0,  0,  0,     1.98e-6,  0.00e-6 ],
+      [ 0,  0,  0,  0,  3,  0,  0,  0,    -1.72e-6,  0.00e-6 ],
+      [ 0,  1,  0,  0,  1,  0,  0,  0,    -1.41e-6, -0.01e-6 ],
+      [ 0,  1,  0,  0, -1,  0,  0,  0,    -1.26e-6, -0.01e-6 ],
+
+   /* 11-20 */
+      [ 1,  0,  0,  0, -1,  0,  0,  0,    -0.63e-6,  0.00e-6 ],
+      [ 1,  0,  0,  0,  1,  0,  0,  0,    -0.63e-6,  0.00e-6 ],
+      [ 0,  1,  2, -2,  3,  0,  0,  0,     0.46e-6,  0.00e-6 ],
+      [ 0,  1,  2, -2,  1,  0,  0,  0,     0.45e-6,  0.00e-6 ],
+      [ 0,  0,  4, -4,  4,  0,  0,  0,     0.36e-6,  0.00e-6 ],
+      [ 0,  0,  1, -1,  1, -8, 12,  0,    -0.24e-6, -0.12e-6 ],
+      [ 0,  0,  2,  0,  0,  0,  0,  0,     0.32e-6,  0.00e-6 ],
+      [ 0,  0,  2,  0,  2,  0,  0,  0,     0.28e-6,  0.00e-6 ],
+      [ 1,  0,  2,  0,  3,  0,  0,  0,     0.27e-6,  0.00e-6 ],
+      [ 1,  0,  2,  0,  1,  0,  0,  0,     0.26e-6,  0.00e-6 ],
+
+   /* 21-30 */
+      [ 0,  0,  2, -2,  0,  0,  0,  0,    -0.21e-6,  0.00e-6 ],
+      [ 0,  1, -2,  2, -3,  0,  0,  0,     0.19e-6,  0.00e-6 ],
+      [ 0,  1, -2,  2, -1,  0,  0,  0,     0.18e-6,  0.00e-6 ],
+      [ 0,  0,  0,  0,  0,  8,-13, -1,    -0.10e-6,  0.05e-6 ],
+      [ 0,  0,  0,  2,  0,  0,  0,  0,     0.15e-6,  0.00e-6 ],
+      [ 2,  0, -2,  0, -1,  0,  0,  0,    -0.14e-6,  0.00e-6 ],
+      [ 1,  0,  0, -2,  1,  0,  0,  0,     0.14e-6,  0.00e-6 ],
+      [ 0,  1,  2, -2,  2,  0,  0,  0,    -0.14e-6,  0.00e-6 ],
+      [ 1,  0,  0, -2, -1,  0,  0,  0,     0.14e-6,  0.00e-6 ],
+      [ 0,  0,  4, -2,  4,  0,  0,  0,     0.13e-6,  0.00e-6 ],
+
+   /* 31-33 */
+      [ 0,  0,  2, -2,  4,  0,  0,  0,    -0.11e-6,  0.00e-6 ],
+      [ 1,  0, -2,  0, -3,  0,  0,  0,     0.11e-6,  0.00e-6 ],
+      [ 1,  0, -2,  0, -1,  0,  0,  0,     0.11e-6,  0.00e-6 ]
+   ];
+
+
+/* Terms of order t^1 */
+   var e1 = [
+      [ 0,  0,  0,  0,  1,  0,  0,  0,     -0.87e-6,  0.00e-6 ]
+   ];
+
+
+/* Number of terms in the series */
+   var NE0 = e0.length;
+   var NE1 = e1.length;
+
+/* ------------------------------------------------------------------ */
+
+/* Interval between fundamental epoch J2000.0 and current date (JC). */
+   t = ((date1 - ERFA_DJ00) + date2) / ERFA_DJC;
+
+/* Fundamental Arguments (from IERS Conventions 2003) */
+
+/* Mean anomaly of the Moon. */
+   fa[0] = eraFal03(t);
+
+/* Mean anomaly of the Sun. */
+   fa[1] = eraFalp03(t);
+
+/* Mean longitude of the Moon minus that of the ascending node. */
+   fa[2] = eraFaf03(t);
+
+/* Mean elongation of the Moon from the Sun. */
+   fa[3] = eraFad03(t);
+
+/* Mean longitude of the ascending node of the Moon. */
+   fa[4] = eraFaom03(t);
+
+/* Mean longitude of Venus. */
+   fa[5] = eraFave03(t);
+
+/* Mean longitude of Earth. */
+   fa[6] = eraFae03(t);
+
+/* General precession in longitude. */
+   fa[7] = eraFapa03(t);
+
+/* Evaluate the EE complementary terms. */
+   s0 = 0.0;
+   s1 = 0.0;
+
+   for (i = ~~(NE0-1); i >= 0; i--) {
+      a = 0.0;
+      for (j = 0; j < 8; j++) {
+         a += (e0[i][j]) * fa[j];
+      }
+      s0 += e0[i][8] * Math.sin(a) + e0[i][9] * Math.cos(a);
+   }
+
+   for (i = ~~(NE1-1); i >= 0; i--) {
+      a = 0.0;
+      for (j = 0; j < 8; j++) {
+         a += (e1[i][j]) * fa[j];
+      }
+      s1 += e1[i][8] * Math.sin(a) + e1[i][9] * Math.cos(a);
+   }
+
+   eect = (s0 + s1 * t ) * ERFA_DAS2R;
+
+   return eect;
+
+}
+;
+function eraFalp03(t)
+{
+   var a;
+
+
+/* Mean anomaly of the Sun (IERS Conventions 2003). */
+   a = ((1287104.793048 +
+             t * ( 129596581.0481 +
+             t * (       - 0.5532 +
+             t * (         0.000136 +
+             t * (       - 0.00001149 ) ) ) )) % (ERFA_TURNAS)) * ERFA_DAS2R;
+
+   return a;
+
+}
+;
+function eraFad03(t)
+{
+   var a;
+
+
+/* Mean elongation of the Moon from the Sun (IERS Conventions 2003). */
+   a = ((1072260.703692 +
+             t * ( 1602961601.2090 +
+             t * (        - 6.3706 +
+             t * (          0.006593 +
+             t * (        - 0.00003169 ) ) ) )) % (ERFA_TURNAS)) * ERFA_DAS2R;
+
+   return a;
+
+}
+;
+function eraRxp(r, p)
+{
+   var rp = [0, 0, 0];;
+
+
+   var w, wrp = [];
+   var i, j;
+
+
+/* Matrix r * vector p. */
+   for (j = 0; j < 3; j++) {
+       w = 0.0;
+       for (i = 0; i < 3; i++) {
+           w += r[j][i] * p[i];
+       }
+       wrp[j] = w;
+   }
+
+/* Return the result. */
+   rp = eraCp(wrp);
+
+   return rp;
+
+}
+;
+function eraNut06a(date1, date2)
+{
+   var dpsi = 0.0;;
+   var deps = 0.0;;
+   var _rv1;
+
+   var t, fj2, dp, de;
+
+
+/* Interval between fundamental date J2000.0 and given date (JC). */
+   t = ((date1 - ERFA_DJ00) + date2) / ERFA_DJC;
+
+/* Factor correcting for secular variation of J2. */
+   fj2 = -2.7774e-6 * t;
+
+/* Obtain IAU 2000A nutation. */
+   (_rv1 = eraNut00a(date1, date2))[0];
+   dp = _rv1[0];
+   de = _rv1[1];
+
+/* Apply P03 adjustments (Wallace & Capitaine, 2006, Eqs.5). */
+   dpsi = dp + dp * (0.4697e-6 + fj2);
+   deps = de + de * fj2;
+
+   return [dpsi, deps];
+
+}
+;
+
 function eraNut00a(date1, date2)
-/*
-**  - - - - - - - - - -
-**   e r a N u t 0 0 a
-**  - - - - - - - - - -
-**
-**  Nutation, IAU 2000A model (MHB2000 luni-solar and planetary nutation
-**  with free core nutation omitted).
-**
-**  Given:
-**     date1,date2   double   TT as a 2-part Julian Date (Note 1)
-**
-**  Returned:
-**     dpsi,deps     double   nutation, luni-solar + planetary (Note 2)
-**
-**  Notes:
-**
-**  1) The TT date date1+date2 is a Julian Date, apportioned in any
-**     convenient way between the two arguments.  For example,
-**     JD(TT)=2450123.7 could be expressed in any of these ways,
-**     among others:
-**
-**            date1          date2
-**
-**         2450123.7           0.0       (JD method)
-**         2451545.0       -1421.3       (J2000 method)
-**         2400000.5       50123.2       (MJD method)
-**         2450123.5           0.2       (date & time method)
-**
-**     The JD method is the most natural and convenient to use in
-**     cases where the loss of several decimal digits of resolution
-**     is acceptable.  The J2000 method is best matched to the way
-**     the argument is handled internally and will deliver the
-**     optimum resolution.  The MJD method and the date & time methods
-**     are both good compromises between resolution and convenience.
-**
-**  2) The nutation components in longitude and obliquity are in radians
-**     and with respect to the equinox and ecliptic of date.  The
-**     obliquity at J2000.0 is assumed to be the Lieske et al. (1977)
-**     value of 84381.448 arcsec.
-**
-**     Both the luni-solar and planetary nutations are included.  The
-**     latter are due to direct planetary nutations and the
-**     perturbations of the lunar and terrestrial orbits.
-**
-**  3) The function computes the MHB2000 nutation series with the
-**     associated corrections for planetary nutations.  It is an
-**     implementation of the nutation part of the IAU 2000A precession-
-**     nutation model, formally adopted by the IAU General Assembly in
-**     2000, namely MHB2000 (Mathews et al. 2002), but with the free
-**     core nutation (FCN - see Note 4) omitted.
-**
-**  4) The full MHB2000 model also contains contributions to the
-**     nutations in longitude and obliquity due to the free-excitation
-**     of the free-core-nutation during the period 1979-2000.  These FCN
-**     terms, which are time-dependent and unpredictable, are NOT
-**     included in the present function and, if required, must be
-**     independently computed.  With the FCN corrections included, the
-**     present function delivers a pole which is at current epochs
-**     accurate to a few hundred microarcseconds.  The omission of FCN
-**     introduces further errors of about that size.
-**
-**  5) The present function provides classical nutation.  The MHB2000
-**     algorithm, from which it is adapted, deals also with (i) the
-**     offsets between the GCRS and mean poles and (ii) the adjustments
-**     in longitude and obliquity due to the changed precession rates.
-**     These additional functions, namely frame bias and precession
-**     adjustments, are supported by the ERFA functions eraBi00  and
-**     eraPr00.
-**
-**  6) The MHB2000 algorithm also provides "total" nutations, comprising
-**     the arithmetic sum of the frame bias, precession adjustments,
-**     luni-solar nutation and planetary nutation.  These total
-**     nutations can be used in combination with an existing IAU 1976
-**     precession implementation, such as eraPmat76,  to deliver GCRS-
-**     to-true predictions of sub-mas accuracy at current dates.
-**     However, there are three shortcomings in the MHB2000 model that
-**     must be taken into account if more accurate or definitive results
-**     are required (see Wallace 2002):
-**
-**       (i) The MHB2000 total nutations are simply arithmetic sums,
-**           yet in reality the various components are successive Euler
-**           rotations.  This slight lack of rigor leads to cross terms
-**           that exceed 1 mas after a century.  The rigorous procedure
-**           is to form the GCRS-to-true rotation matrix by applying the
-**           bias, precession and nutation in that order.
-**
-**      (ii) Although the precession adjustments are stated to be with
-**           respect to Lieske et al. (1977), the MHB2000 model does
-**           not specify which set of Euler angles are to be used and
-**           how the adjustments are to be applied.  The most literal
-**           and straightforward procedure is to adopt the 4-rotation
-**           epsilon_0, psi_A, omega_A, xi_A option, and to add DPSIPR
-**           to psi_A and DEPSPR to both omega_A and eps_A.
-**
-**     (iii) The MHB2000 model predates the determination by Chapront
-**           et al. (2002) of a 14.6 mas displacement between the
-**           J2000.0 mean equinox and the origin of the ICRS frame.  It
-**           should, however, be noted that neglecting this displacement
-**           when calculating star coordinates does not lead to a
-**           14.6 mas change in right ascension, only a small second-
-**           order distortion in the pattern of the precession-nutation
-**           effect.
-**
-**     For these reasons, the ERFA functions do not generate the "total
-**     nutations" directly, though they can of course easily be
-**     generated by calling eraBi00, eraPr00 and the present function
-**     and adding the results.
-**
-**  7) The MHB2000 model contains 41 instances where the same frequency
-**     appears multiple times, of which 38 are duplicates and three are
-**     triplicates.  To keep the present code close to the original MHB
-**     algorithm, this small inefficiency has not been corrected.
-**
-**  Called:
-**     eraFal03     mean anomaly of the Moon
-**     eraFaf03     mean argument of the latitude of the Moon
-**     eraFaom03    mean longitude of the Moon's ascending node
-**     eraFame03    mean longitude of Mercury
-**     eraFave03    mean longitude of Venus
-**     eraFae03     mean longitude of Earth
-**     eraFama03    mean longitude of Mars
-**     eraFaju03    mean longitude of Jupiter
-**     eraFasa03    mean longitude of Saturn
-**     eraFaur03    mean longitude of Uranus
-**     eraFapa03    general accumulated precession in longitude
-**
-**  References:
-**
-**     Chapront, J., Chapront-Touze, M. & Francou, G. 2002,
-**     Astron.Astrophys. 387, 700
-**
-**     Lieske, J.H., Lederle, T., Fricke, W. & Morando, B. 1977,
-**     Astron.Astrophys. 58, 1-16
-**
-**     Mathews, P.M., Herring, T.A., Buffet, B.A. 2002, J.Geophys.Res.
-**     107, B4.  The MHB_2000 code itself was obtained on 9th September
-**     2002 from ftp//maia.usno.navy.mil/conv2000/chapter5/IAU2000A.
-**
-**     Simon, J.-L., Bretagnon, P., Chapront, J., Chapront-Touze, M.,
-**     Francou, G., Laskar, J. 1994, Astron.Astrophys. 282, 663-683
-**
-**     Souchay, J., Loysel, B., Kinoshita, H., Folgueira, M. 1999,
-**     Astron.Astrophys.Supp.Ser. 135, 111
-**
-**     Wallace, P.T., "Software for Implementing the IAU 2000
-**     Resolutions", in IERS Workshop 5.1 (2002)
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
 {
    var dpsi = 0.0;;
    var deps = 0.0;;
@@ -6171,1337 +3349,41 @@ function eraNut00a(date1, date2)
 
 }
 ;
-function eraFal03(t)
-/*
-**  - - - - - - - - -
-**   e r a F a l 0 3
-**  - - - - - - - - -
-**
-**  Fundamental argument, IERS Conventions (2003):
-**  mean anomaly of the Moon.
-**
-**  Given:
-**     t     double    TDB, Julian centuries since J2000.0 (Note 1)
-**
-**  Returned (function value):
-**           double    l, radians (Note 2)
-**
-**  Notes:
-**
-**  1) Though t is strictly TDB, it is usually more convenient to use
-**     TT, which makes no significant difference.
-**
-**  2) The expression used is as adopted in IERS Conventions (2003) and
-**     is from Simon et al. (1994).
-**
-**  References:
-**
-**     McCarthy, D. D., Petit, G. (eds.), IERS Conventions (2003),
-**     IERS Technical Note No. 32, BKG (2004)
-**
-**     Simon, J.-L., Bretagnon, P., Chapront, J., Chapront-Touze, M.,
-**     Francou, G., Laskar, J. 1994, Astron.Astrophys. 282, 663-683
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
-{
-   var a;
 
-
-/* Mean anomaly of the Moon (IERS Conventions 2003). */
-   a = ((485868.249036  +
-             t * ( 1717915923.2178 +
-             t * (         31.8792 +
-             t * (          0.051635 +
-             t * (        - 0.00024470 ) ) ) )) % (ERFA_TURNAS)) * ERFA_DAS2R;
-
-   return a;
-
-}
-;
-function eraFaf03(t)
-/*
-**  - - - - - - - - -
-**   e r a F a f 0 3
-**  - - - - - - - - -
-**
-**  Fundamental argument, IERS Conventions (2003):
-**  mean longitude of the Moon minus mean longitude of the ascending
-**  node.
-**
-**  Given:
-**     t     double    TDB, Julian centuries since J2000.0 (Note 1)
-**
-**  Returned (function value):
-**           double    F, radians (Note 2)
-**
-**  Notes:
-**
-**  1) Though t is strictly TDB, it is usually more convenient to use
-**     TT, which makes no significant difference.
-**
-**  2) The expression used is as adopted in IERS Conventions (2003) and
-**     is from Simon et al. (1994).
-**
-**  References:
-**
-**     McCarthy, D. D., Petit, G. (eds.), IERS Conventions (2003),
-**     IERS Technical Note No. 32, BKG (2004)
-**
-**     Simon, J.-L., Bretagnon, P., Chapront, J., Chapront-Touze, M.,
-**     Francou, G., Laskar, J. 1994, Astron.Astrophys. 282, 663-683
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
-{
-   var a;
-
-
-/* Mean longitude of the Moon minus that of the ascending node */
-/* (IERS Conventions 2003).                                    */
-   a = ((335779.526232 +
-             t * ( 1739527262.8478 +
-             t * (       - 12.7512 +
-             t * (        - 0.001037 +
-             t * (          0.00000417 ) ) ) )) % (ERFA_TURNAS)) * ERFA_DAS2R;
-
-   return a;
-
-
-}
-;
-function eraFaom03(t)
-/*
-**  - - - - - - - - - -
-**   e r a F a o m 0 3
-**  - - - - - - - - - -
-**
-**  Fundamental argument, IERS Conventions (2003):
-**  mean longitude of the Moon's ascending node.
-**
-**  Given:
-**     t     double    TDB, Julian centuries since J2000.0 (Note 1)
-**
-**  Returned (function value):
-**           double    Omega, radians (Note 2)
-**
-**  Notes:
-**
-**  1) Though t is strictly TDB, it is usually more convenient to use
-**     TT, which makes no significant difference.
-**
-**  2) The expression used is as adopted in IERS Conventions (2003) and
-**     is from Simon et al. (1994).
-**
-**  References:
-**
-**     McCarthy, D. D., Petit, G. (eds.), IERS Conventions (2003),
-**     IERS Technical Note No. 32, BKG (2004)
-**
-**     Simon, J.-L., Bretagnon, P., Chapront, J., Chapront-Touze, M.,
-**     Francou, G., Laskar, J. 1994, Astron.Astrophys. 282, 663-683
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
-{
-   var a;
-
-
-/* Mean longitude of the Moon's ascending node */
-/* (IERS Conventions 2003).                    */
-   a = ((450160.398036 +
-             t * ( - 6962890.5431 +
-             t * (         7.4722 +
-             t * (         0.007702 +
-             t * (       - 0.00005939 ) ) ) )) % (ERFA_TURNAS)) * ERFA_DAS2R;
-
-   return a;
-
-}
-;
-function eraFapa03(t)
-/*
-**  - - - - - - - - - -
-**   e r a F a p a 0 3
-**  - - - - - - - - - -
-**
-**  Fundamental argument, IERS Conventions (2003):
-**  general accumulated precession in longitude.
-**
-**  Given:
-**     t     double    TDB, Julian centuries since J2000.0 (Note 1)
-**
-**  Returned (function value):
-**           double    general precession in longitude, radians (Note 2)
-**
-**  Notes:
-**
-**  1) Though t is strictly TDB, it is usually more convenient to use
-**     TT, which makes no significant difference.
-**
-**  2) The expression used is as adopted in IERS Conventions (2003).  It
-**     is taken from Kinoshita & Souchay (1990) and comes originally
-**     from Lieske et al. (1977).
-**
-**  References:
-**
-**     Kinoshita, H. and Souchay J. 1990, Celest.Mech. and Dyn.Astron.
-**     48, 187
-**
-**     Lieske, J.H., Lederle, T., Fricke, W. & Morando, B. 1977,
-**     Astron.Astrophys. 58, 1-16
-**
-**     McCarthy, D. D., Petit, G. (eds.), IERS Conventions (2003),
-**     IERS Technical Note No. 32, BKG (2004)
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
-{
-   var a;
-
-
-/* General accumulated precession in longitude. */
-   a = (0.024381750 + 0.00000538691 * t) * t;
-
-   return a;
-
-}
-;
-function eraFame03(t)
-/*
-**  - - - - - - - - - -
-**   e r a F a m e 0 3
-**  - - - - - - - - - -
-**
-**  Fundamental argument, IERS Conventions (2003):
-**  mean longitude of Mercury.
-**
-**  Given:
-**     t     double    TDB, Julian centuries since J2000.0 (Note 1)
-**
-**  Returned (function value):
-**           double    mean longitude of Mercury, radians (Note 2)
-**
-**  Notes:
-**
-**  1) Though t is strictly TDB, it is usually more convenient to use
-**     TT, which makes no significant difference.
-**
-**  2) The expression used is as adopted in IERS Conventions (2003) and
-**     comes from Souchay et al. (1999) after Simon et al. (1994).
-**
-**  References:
-**
-**     McCarthy, D. D., Petit, G. (eds.), IERS Conventions (2003),
-**     IERS Technical Note No. 32, BKG (2004)
-**
-**     Simon, J.-L., Bretagnon, P., Chapront, J., Chapront-Touze, M.,
-**     Francou, G., Laskar, J. 1994, Astron.Astrophys. 282, 663-683
-**
-**     Souchay, J., Loysel, B., Kinoshita, H., Folgueira, M. 1999,
-**     Astron.Astrophys.Supp.Ser. 135, 111
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
-{
-   var a;
-
-
-/* Mean longitude of Mercury (IERS Conventions 2003). */
-   a = ((4.402608842 + 2608.7903141574 * t) % (ERFA_D2PI));
-
-   return a;
-
-}
-;
-function eraFave03(t)
-/*
-**  - - - - - - - - - -
-**   e r a F a v e 0 3
-**  - - - - - - - - - -
-**
-**  Fundamental argument, IERS Conventions (2003):
-**  mean longitude of Venus.
-**
-**  Given:
-**     t     double    TDB, Julian centuries since J2000.0 (Note 1)
-**
-**  Returned (function value):
-**           double    mean longitude of Venus, radians (Note 2)
-**
-**  Notes:
-**
-**  1) Though t is strictly TDB, it is usually more convenient to use
-**     TT, which makes no significant difference.
-**
-**  2) The expression used is as adopted in IERS Conventions (2003) and
-**     comes from Souchay et al. (1999) after Simon et al. (1994).
-**
-**  References:
-**
-**     McCarthy, D. D., Petit, G. (eds.), IERS Conventions (2003),
-**     IERS Technical Note No. 32, BKG (2004)
-**
-**     Simon, J.-L., Bretagnon, P., Chapront, J., Chapront-Touze, M.,
-**     Francou, G., Laskar, J. 1994, Astron.Astrophys. 282, 663-683
-**
-**     Souchay, J., Loysel, B., Kinoshita, H., Folgueira, M. 1999,
-**     Astron.Astrophys.Supp.Ser. 135, 111
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
-{
-   var a;
-
-
-/* Mean longitude of Venus (IERS Conventions 2003). */
-   a = ((3.176146697 + 1021.3285546211 * t) % (ERFA_D2PI));
-
-   return a;
-
-}
-;
-function eraFae03(t)
-/*
-**  - - - - - - - - -
-**   e r a F a e 0 3
-**  - - - - - - - - -
-**
-**  Fundamental argument, IERS Conventions (2003):
-**  mean longitude of Earth.
-**
-**  Given:
-**     t     double    TDB, Julian centuries since J2000.0 (Note 1)
-**
-**  Returned (function value):
-**           double    mean longitude of Earth, radians (Note 2)
-**
-**  Notes:
-**
-**  1) Though t is strictly TDB, it is usually more convenient to use
-**     TT, which makes no significant difference.
-**
-**  2) The expression used is as adopted in IERS Conventions (2003) and
-**     comes from Souchay et al. (1999) after Simon et al. (1994).
-**
-**  References:
-**
-**     McCarthy, D. D., Petit, G. (eds.), IERS Conventions (2003),
-**     IERS Technical Note No. 32, BKG (2004)
-**
-**     Simon, J.-L., Bretagnon, P., Chapront, J., Chapront-Touze, M.,
-**     Francou, G., Laskar, J. 1994, Astron.Astrophys. 282, 663-683
-**
-**     Souchay, J., Loysel, B., Kinoshita, H., Folgueira, M. 1999,
-**     Astron.Astrophys.Supp.Ser. 135, 111
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
-{
-   var a;
-
-
-/* Mean longitude of Earth (IERS Conventions 2003). */
-   a = ((1.753470314 + 628.3075849991 * t) % (ERFA_D2PI));
-
-   return a;
-
-}
-;
-function eraFama03(t)
-/*
-**  - - - - - - - - - -
-**   e r a F a m a 0 3
-**  - - - - - - - - - -
-**
-**  Fundamental argument, IERS Conventions (2003):
-**  mean longitude of Mars.
-**
-**  Given:
-**     t     double    TDB, Julian centuries since J2000.0 (Note 1)
-**
-**  Returned (function value):
-**           double    mean longitude of Mars, radians (Note 2)
-**
-**  Notes:
-**
-**  1) Though t is strictly TDB, it is usually more convenient to use
-**     TT, which makes no significant difference.
-**
-**  2) The expression used is as adopted in IERS Conventions (2003) and
-**     comes from Souchay et al. (1999) after Simon et al. (1994).
-**
-**  References:
-**
-**     McCarthy, D. D., Petit, G. (eds.), IERS Conventions (2003),
-**     IERS Technical Note No. 32, BKG (2004)
-**
-**     Simon, J.-L., Bretagnon, P., Chapront, J., Chapront-Touze, M.,
-**     Francou, G., Laskar, J. 1994, Astron.Astrophys. 282, 663-683
-**
-**     Souchay, J., Loysel, B., Kinoshita, H., Folgueira, M. 1999,
-**     Astron.Astrophys.Supp.Ser. 135, 111
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
-{
-   var a;
-
-
-/* Mean longitude of Mars (IERS Conventions 2003). */
-   a = ((6.203480913 + 334.0612426700 * t) % (ERFA_D2PI));
-
-   return a;
-
-}
-;
-function eraFaju03(t)
-/*
-**  - - - - - - - - - -
-**   e r a F a j u 0 3
-**  - - - - - - - - - -
-**
-**  Fundamental argument, IERS Conventions (2003):
-**  mean longitude of Jupiter.
-**
-**  Given:
-**     t     double    TDB, Julian centuries since J2000.0 (Note 1)
-**
-**  Returned (function value):
-**           double    mean longitude of Jupiter, radians (Note 2)
-**
-**  Notes:
-**
-**  1) Though t is strictly TDB, it is usually more convenient to use
-**     TT, which makes no significant difference.
-**
-**  2) The expression used is as adopted in IERS Conventions (2003) and
-**     comes from Souchay et al. (1999) after Simon et al. (1994).
-**
-**  References:
-**
-**     McCarthy, D. D., Petit, G. (eds.), IERS Conventions (2003),
-**     IERS Technical Note No. 32, BKG (2004)
-**
-**     Simon, J.-L., Bretagnon, P., Chapront, J., Chapront-Touze, M.,
-**     Francou, G., Laskar, J. 1994, Astron.Astrophys. 282, 663-683
-**
-**     Souchay, J., Loysel, B., Kinoshita, H., Folgueira, M. 1999,
-**     Astron.Astrophys.Supp.Ser. 135, 111
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
-{
-   var a;
-
-
-/* Mean longitude of Jupiter (IERS Conventions 2003). */
-   a = ((0.599546497 + 52.9690962641 * t) % (ERFA_D2PI));
-
-   return a;
-
-}
-;
-function eraFasa03(t)
-/*
-**  - - - - - - - - - -
-**   e r a F a s a 0 3
-**  - - - - - - - - - -
-**
-**  Fundamental argument, IERS Conventions (2003):
-**  mean longitude of Saturn.
-**
-**  Given:
-**     t     double    TDB, Julian centuries since J2000.0 (Note 1)
-**
-**  Returned (function value):
-**           double    mean longitude of Saturn, radians (Note 2)
-**
-**  Notes:
-**
-**  1) Though t is strictly TDB, it is usually more convenient to use
-**     TT, which makes no significant difference.
-**
-**  2) The expression used is as adopted in IERS Conventions (2003) and
-**     comes from Souchay et al. (1999) after Simon et al. (1994).
-**
-**  References:
-**
-**     McCarthy, D. D., Petit, G. (eds.), IERS Conventions (2003),
-**     IERS Technical Note No. 32, BKG (2004)
-**
-**     Simon, J.-L., Bretagnon, P., Chapront, J., Chapront-Touze, M.,
-**     Francou, G., Laskar, J. 1994, Astron.Astrophys. 282, 663-683
-**
-**     Souchay, J., Loysel, B., Kinoshita, H., Folgueira, M. 1999,
-**     Astron.Astrophys.Supp.Ser. 135, 111
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
-{
-   var a;
-
-
-/* Mean longitude of Saturn (IERS Conventions 2003). */
-   a = ((0.874016757 + 21.3299104960 * t) % (ERFA_D2PI));
-
-   return a;
-
-}
-;
-function eraFaur03(t)
-/*
-**  - - - - - - - - - -
-**   e r a F a u r 0 3
-**  - - - - - - - - - -
-**
-**  Fundamental argument, IERS Conventions (2003):
-**  mean longitude of Uranus.
-**
-**  Given:
-**     t     double    TDB, Julian centuries since J2000.0 (Note 1)
-**
-**  Returned  (function value):
-**           double    mean longitude of Uranus, radians (Note 2)
-**
-**  Notes:
-**
-**  1) Though t is strictly TDB, it is usually more convenient to use
-**     TT, which makes no significant difference.
-**
-**  2) The expression used is as adopted in IERS Conventions (2003) and
-**     is adapted from Simon et al. (1994).
-**
-**  References:
-**
-**     McCarthy, D. D., Petit, G. (eds.), IERS Conventions (2003),
-**     IERS Technical Note No. 32, BKG (2004)
-**
-**     Simon, J.-L., Bretagnon, P., Chapront, J., Chapront-Touze, M.,
-**     Francou, G., Laskar, J. 1994, Astron.Astrophys. 282, 663-683
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
-{
-   var a;
-
-
-/* Mean longitude of Uranus (IERS Conventions 2003). */
-   a = ((5.481293872 + 7.4781598567 * t) % (ERFA_D2PI));
-
-   return a;
-
-}
-;
-function eraEe00(date1, date2, epsa, dpsi)
-/*
-**  - - - - - - - -
-**   e r a E e 0 0
-**  - - - - - - - -
-**
-**  The equation of the equinoxes, compatible with IAU 2000 resolutions,
-**  given the nutation in longitude and the mean obliquity.
-**
-**  Given:
-**     date1,date2  double    TT as a 2-part Julian Date (Note 1)
-**     epsa         double    mean obliquity (Note 2)
-**     dpsi         double    nutation in longitude (Note 3)
-**
-**  Returned (function value):
-**                  double    equation of the equinoxes (Note 4)
-**
-**  Notes:
-**
-**  1) The TT date date1+date2 is a Julian Date, apportioned in any
-**     convenient way between the two arguments.  For example,
-**     JD(TT)=2450123.7 could be expressed in any of these ways,
-**     among others:
-**
-**            date1          date2
-**
-**         2450123.7           0.0       (JD method)
-**         2451545.0       -1421.3       (J2000 method)
-**         2400000.5       50123.2       (MJD method)
-**         2450123.5           0.2       (date & time method)
-**
-**     The JD method is the most natural and convenient to use in
-**     cases where the loss of several decimal digits of resolution
-**     is acceptable.  The J2000 method is best matched to the way
-**     the argument is handled internally and will deliver the
-**     optimum resolution.  The MJD method and the date & time methods
-**     are both good compromises between resolution and convenience.
-**
-**  2) The obliquity, in radians, is mean of date.
-**
-**  3) The result, which is in radians, operates in the following sense:
-**
-**        Greenwich apparent ST = GMST + equation of the equinoxes
-**
-**  4) The result is compatible with the IAU 2000 resolutions.  For
-**     further details, see IERS Conventions 2003 and Capitaine et al.
-**     (2002).
-**
-**  Called:
-**     eraEect00    equation of the equinoxes complementary terms
-**
-**  References:
-**
-**     Capitaine, N., Wallace, P.T. and McCarthy, D.D., "Expressions to
-**     implement the IAU 2000 definition of UT1", Astronomy &
-**     Astrophysics, 406, 1135-1149 (2003)
-**
-**     McCarthy, D. D., Petit, G. (eds.), IERS Conventions (2003),
-**     IERS Technical Note No. 32, BKG (2004)
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
-{
-   var ee;
-
-
-/* Equation of the equinoxes. */
-   ee = dpsi * Math.cos(epsa) + eraEect00(date1, date2);
-
-   return ee;
-
-}
-;
-function eraEect00(date1, date2)
-/*
-**  - - - - - - - - - -
-**   e r a E e c t 0 0
-**  - - - - - - - - - -
-**
-**  Equation of the equinoxes complementary terms, consistent with
-**  IAU 2000 resolutions.
-**
-**  Given:
-**     date1,date2  double   TT as a 2-part Julian Date (Note 1)
-**
-**  Returned (function value):
-**                  double   complementary terms (Note 2)
-**
-**  Notes:
-**
-**  1) The TT date date1+date2 is a Julian Date, apportioned in any
-**     convenient way between the two arguments.  For example,
-**     JD(TT)=2450123.7 could be expressed in any of these ways,
-**     among others:
-**
-**            date1          date2
-**
-**         2450123.7           0.0       (JD method)
-**         2451545.0       -1421.3       (J2000 method)
-**         2400000.5       50123.2       (MJD method)
-**         2450123.5           0.2       (date & time method)
-**
-**     The JD method is the most natural and convenient to use in
-**     cases where the loss of several decimal digits of resolution
-**     is acceptable.  The J2000 method is best matched to the way
-**     the argument is handled internally and will deliver the
-**     optimum resolution.  The MJD method and the date & time methods
-**     are both good compromises between resolution and convenience.
-**
-**  2) The "complementary terms" are part of the equation of the
-**     equinoxes (EE), classically the difference between apparent and
-**     mean Sidereal Time:
-**
-**        GAST = GMST + EE
-**
-**     with:
-**
-**        EE = dpsi * cos(eps)
-**
-**     where dpsi is the nutation in longitude and eps is the obliquity
-**     of date.  However, if the rotation of the Earth were constant in
-**     an inertial frame the classical formulation would lead to
-**     apparent irregularities in the UT1 timescale traceable to side-
-**     effects of precession-nutation.  In order to eliminate these
-**     effects from UT1, "complementary terms" were introduced in 1994
-**     (IAU, 1994) and took effect from 1997 (Capitaine and Gontier,
-**     1993):
-**
-**        GAST = GMST + CT + EE
-**
-**     By convention, the complementary terms are included as part of
-**     the equation of the equinoxes rather than as part of the mean
-**     Sidereal Time.  This slightly compromises the "geometrical"
-**     interpretation of mean sidereal time but is otherwise
-**     inconsequential.
-**
-**     The present function computes CT in the above expression,
-**     compatible with IAU 2000 resolutions (Capitaine et al., 2002, and
-**     IERS Conventions 2003).
-**
-**  Called:
-**     eraFal03     mean anomaly of the Moon
-**     eraFalp03    mean anomaly of the Sun
-**     eraFaf03     mean argument of the latitude of the Moon
-**     eraFad03     mean elongation of the Moon from the Sun
-**     eraFaom03    mean longitude of the Moon's ascending node
-**     eraFave03    mean longitude of Venus
-**     eraFae03     mean longitude of Earth
-**     eraFapa03    general accumulated precession in longitude
-**
-**  References:
-**
-**     Capitaine, N. & Gontier, A.-M., Astron.Astrophys., 275,
-**     645-650 (1993)
-**
-**     Capitaine, N., Wallace, P.T. and McCarthy, D.D., "Expressions to
-**     implement the IAU 2000 definition of UT1", Astron.Astrophys., 406,
-**     1135-1149 (2003)
-**
-**     IAU Resolution C7, Recommendation 3 (1994)
-**
-**     McCarthy, D. D., Petit, G. (eds.), IERS Conventions (2003),
-**     IERS Technical Note No. 32, BKG (2004)
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
-{
-/* Time since J2000.0, in Julian centuries */
-   var t;
-
-/* Miscellaneous */
-   var i, j;
-   var a, s0, s1;
-
-/* Fundamental arguments */
-   var fa = [];
-
-/* Returned value. */
-   var eect;
-
-/* ----------------------------------------- */
-/* The series for the EE complementary terms */
-/* ----------------------------------------- */
-
-   /* Terms of order t^0 */
-   var e0 = [
-
-   /* 1-10 */
-      [ 0,  0,  0,  0,  1,  0,  0,  0,  2640.96e-6, -0.39e-6 ],
-      [ 0,  0,  0,  0,  2,  0,  0,  0,    63.52e-6, -0.02e-6 ],
-      [ 0,  0,  2, -2,  3,  0,  0,  0,    11.75e-6,  0.01e-6 ],
-      [ 0,  0,  2, -2,  1,  0,  0,  0,    11.21e-6,  0.01e-6 ],
-      [ 0,  0,  2, -2,  2,  0,  0,  0,    -4.55e-6,  0.00e-6 ],
-      [ 0,  0,  2,  0,  3,  0,  0,  0,     2.02e-6,  0.00e-6 ],
-      [ 0,  0,  2,  0,  1,  0,  0,  0,     1.98e-6,  0.00e-6 ],
-      [ 0,  0,  0,  0,  3,  0,  0,  0,    -1.72e-6,  0.00e-6 ],
-      [ 0,  1,  0,  0,  1,  0,  0,  0,    -1.41e-6, -0.01e-6 ],
-      [ 0,  1,  0,  0, -1,  0,  0,  0,    -1.26e-6, -0.01e-6 ],
-
-   /* 11-20 */
-      [ 1,  0,  0,  0, -1,  0,  0,  0,    -0.63e-6,  0.00e-6 ],
-      [ 1,  0,  0,  0,  1,  0,  0,  0,    -0.63e-6,  0.00e-6 ],
-      [ 0,  1,  2, -2,  3,  0,  0,  0,     0.46e-6,  0.00e-6 ],
-      [ 0,  1,  2, -2,  1,  0,  0,  0,     0.45e-6,  0.00e-6 ],
-      [ 0,  0,  4, -4,  4,  0,  0,  0,     0.36e-6,  0.00e-6 ],
-      [ 0,  0,  1, -1,  1, -8, 12,  0,    -0.24e-6, -0.12e-6 ],
-      [ 0,  0,  2,  0,  0,  0,  0,  0,     0.32e-6,  0.00e-6 ],
-      [ 0,  0,  2,  0,  2,  0,  0,  0,     0.28e-6,  0.00e-6 ],
-      [ 1,  0,  2,  0,  3,  0,  0,  0,     0.27e-6,  0.00e-6 ],
-      [ 1,  0,  2,  0,  1,  0,  0,  0,     0.26e-6,  0.00e-6 ],
-
-   /* 21-30 */
-      [ 0,  0,  2, -2,  0,  0,  0,  0,    -0.21e-6,  0.00e-6 ],
-      [ 0,  1, -2,  2, -3,  0,  0,  0,     0.19e-6,  0.00e-6 ],
-      [ 0,  1, -2,  2, -1,  0,  0,  0,     0.18e-6,  0.00e-6 ],
-      [ 0,  0,  0,  0,  0,  8,-13, -1,    -0.10e-6,  0.05e-6 ],
-      [ 0,  0,  0,  2,  0,  0,  0,  0,     0.15e-6,  0.00e-6 ],
-      [ 2,  0, -2,  0, -1,  0,  0,  0,    -0.14e-6,  0.00e-6 ],
-      [ 1,  0,  0, -2,  1,  0,  0,  0,     0.14e-6,  0.00e-6 ],
-      [ 0,  1,  2, -2,  2,  0,  0,  0,    -0.14e-6,  0.00e-6 ],
-      [ 1,  0,  0, -2, -1,  0,  0,  0,     0.14e-6,  0.00e-6 ],
-      [ 0,  0,  4, -2,  4,  0,  0,  0,     0.13e-6,  0.00e-6 ],
-
-   /* 31-33 */
-      [ 0,  0,  2, -2,  4,  0,  0,  0,    -0.11e-6,  0.00e-6 ],
-      [ 1,  0, -2,  0, -3,  0,  0,  0,     0.11e-6,  0.00e-6 ],
-      [ 1,  0, -2,  0, -1,  0,  0,  0,     0.11e-6,  0.00e-6 ]
-   ];
-
-
-/* Terms of order t^1 */
-   var e1 = [
-      [ 0,  0,  0,  0,  1,  0,  0,  0,     -0.87e-6,  0.00e-6 ]
-   ];
-
-
-/* Number of terms in the series */
-   var NE0 = e0.length;
-   var NE1 = e1.length;
-
-/* ------------------------------------------------------------------ */
-
-/* Interval between fundamental epoch J2000.0 and current date (JC). */
-   t = ((date1 - ERFA_DJ00) + date2) / ERFA_DJC;
-
-/* Fundamental Arguments (from IERS Conventions 2003) */
-
-/* Mean anomaly of the Moon. */
-   fa[0] = eraFal03(t);
-
-/* Mean anomaly of the Sun. */
-   fa[1] = eraFalp03(t);
-
-/* Mean longitude of the Moon minus that of the ascending node. */
-   fa[2] = eraFaf03(t);
-
-/* Mean elongation of the Moon from the Sun. */
-   fa[3] = eraFad03(t);
-
-/* Mean longitude of the ascending node of the Moon. */
-   fa[4] = eraFaom03(t);
-
-/* Mean longitude of Venus. */
-   fa[5] = eraFave03(t);
-
-/* Mean longitude of Earth. */
-   fa[6] = eraFae03(t);
-
-/* General precession in longitude. */
-   fa[7] = eraFapa03(t);
-
-/* Evaluate the EE complementary terms. */
-   s0 = 0.0;
-   s1 = 0.0;
-
-   for (i = ~~(NE0-1); i >= 0; i--) {
-      a = 0.0;
-      for (j = 0; j < 8; j++) {
-         a += (e0[i][j]) * fa[j];
-      }
-      s0 += e0[i][8] * Math.sin(a) + e0[i][9] * Math.cos(a);
-   }
-
-   for (i = ~~(NE1-1); i >= 0; i--) {
-      a = 0.0;
-      for (j = 0; j < 8; j++) {
-         a += (e1[i][j]) * fa[j];
-      }
-      s1 += e1[i][8] * Math.sin(a) + e1[i][9] * Math.cos(a);
-   }
-
-   eect = (s0 + s1 * t ) * ERFA_DAS2R;
-
-   return eect;
-
-}
-;
-function eraFalp03(t)
-/*
-**  - - - - - - - - - -
-**   e r a F a l p 0 3
-**  - - - - - - - - - -
-**
-**  Fundamental argument, IERS Conventions (2003):
-**  mean anomaly of the Sun.
-**
-**  Given:
-**     t     double    TDB, Julian centuries since J2000.0 (Note 1)
-**
-**  Returned (function value):
-**           double    l', radians (Note 2)
-**
-**  Notes:
-**
-**  1) Though t is strictly TDB, it is usually more convenient to use
-**     TT, which makes no significant difference.
-**
-**  2) The expression used is as adopted in IERS Conventions (2003) and
-**     is from Simon et al. (1994).
-**
-**  References:
-**
-**     McCarthy, D. D., Petit, G. (eds.), IERS Conventions (2003),
-**     IERS Technical Note No. 32, BKG (2004)
-**
-**     Simon, J.-L., Bretagnon, P., Chapront, J., Chapront-Touze, M.,
-**     Francou, G., Laskar, J. 1994, Astron.Astrophys. 282, 663-683
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
-{
-   var a;
-
-
-/* Mean anomaly of the Sun (IERS Conventions 2003). */
-   a = ((1287104.793048 +
-             t * ( 129596581.0481 +
-             t * (       - 0.5532 +
-             t * (         0.000136 +
-             t * (       - 0.00001149 ) ) ) )) % (ERFA_TURNAS)) * ERFA_DAS2R;
-
-   return a;
-
-}
-;
-function eraFad03(t)
-/*
-**  - - - - - - - - -
-**   e r a F a d 0 3
-**  - - - - - - - - -
-**
-**  Fundamental argument, IERS Conventions (2003):
-**  mean elongation of the Moon from the Sun.
-**
-**  Given:
-**     t     double    TDB, Julian centuries since J2000.0 (Note 1)
-**
-**  Returned (function value):
-**           double    D, radians (Note 2)
-**
-**  Notes:
-**
-**  1) Though t is strictly TDB, it is usually more convenient to use
-**     TT, which makes no significant difference.
-**
-**  2) The expression used is as adopted in IERS Conventions (2003) and
-**     is from Simon et al. (1994).
-**
-**  References:
-**
-**     McCarthy, D. D., Petit, G. (eds.), IERS Conventions (2003),
-**     IERS Technical Note No. 32, BKG (2004)
-**
-**     Simon, J.-L., Bretagnon, P., Chapront, J., Chapront-Touze, M.,
-**     Francou, G., Laskar, J. 1994, Astron.Astrophys. 282, 663-683
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
-{
-   var a;
-
-
-/* Mean elongation of the Moon from the Sun (IERS Conventions 2003). */
-   a = ((1072260.703692 +
-             t * ( 1602961601.2090 +
-             t * (        - 6.3706 +
-             t * (          0.006593 +
-             t * (        - 0.00003169 ) ) ) )) % (ERFA_TURNAS)) * ERFA_DAS2R;
-
-   return a;
-
-}
-;
-function eraRxp(r, p)
-/*
-**  - - - - - - -
-**   e r a R x p
-**  - - - - - - -
-**
-**  Multiply a p-vector by an r-matrix.
-**
-**  Given:
-**     r        double[3][3]    r-matrix
-**     p        double[3]       p-vector
-**
-**  Returned:
-**     rp       double[3]       r * p
-**
-**  Note:
-**     It is permissible for p and rp to be the same array.
-**
-**  Called:
-**     eraCp        copy p-vector
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
-{
-   var rp = [0, 0, 0];;
-
-
-   var w, wrp = [];
-   var i, j;
-
-
-/* Matrix r * vector p. */
-   for (j = 0; j < 3; j++) {
-       w = 0.0;
-       for (i = 0; i < 3; i++) {
-           w += r[j][i] * p[i];
-       }
-       wrp[j] = w;
-   }
-
-/* Return the result. */
-   rp = eraCp(wrp);
-
-   return rp;
-
-}
-;
-function eraNut06a(date1, date2)
-/*
-**  - - - - - - - - - -
-**   e r a N u t 0 6 a
-**  - - - - - - - - - -
-**
-**  IAU 2000A nutation with adjustments to match the IAU 2006
-**  precession.
-**
-**  Given:
-**     date1,date2   double   TT as a 2-part Julian Date (Note 1)
-**
-**  Returned:
-**     dpsi,deps     double   nutation, luni-solar + planetary (Note 2)
-**
-**  Notes:
-**
-**  1) The TT date date1+date2 is a Julian Date, apportioned in any
-**     convenient way between the two arguments.  For example,
-**     JD(TT)=2450123.7 could be expressed in any of these ways,
-**     among others:
-**
-**            date1          date2
-**
-**         2450123.7           0.0       (JD method)
-**         2451545.0       -1421.3       (J2000 method)
-**         2400000.5       50123.2       (MJD method)
-**         2450123.5           0.2       (date & time method)
-**
-**     The JD method is the most natural and convenient to use in
-**     cases where the loss of several decimal digits of resolution
-**     is acceptable.  The J2000 method is best matched to the way
-**     the argument is handled internally and will deliver the
-**     optimum resolution.  The MJD method and the date & time methods
-**     are both good compromises between resolution and convenience.
-**
-**  2) The nutation components in longitude and obliquity are in radians
-**     and with respect to the mean equinox and ecliptic of date,
-**     IAU 2006 precession model (Hilton et al. 2006, Capitaine et al.
-**     2005).
-**
-**  3) The function first computes the IAU 2000A nutation, then applies
-**     adjustments for (i) the consequences of the change in obliquity
-**     from the IAU 1980 ecliptic to the IAU 2006 ecliptic and (ii) the
-**     secular variation in the Earth's dynamical form factor J2.
-**
-**  4) The present function provides classical nutation, complementing
-**     the IAU 2000 frame bias and IAU 2006 precession.  It delivers a
-**     pole which is at current epochs accurate to a few tens of
-**     microarcseconds, apart from the free core nutation.
-**
-**  Called:
-**     eraNut00a    nutation, IAU 2000A
-**
-**  References:
-**
-**     Chapront, J., Chapront-Touze, M. & Francou, G. 2002,
-**     Astron.Astrophys. 387, 700
-**
-**     Lieske, J.H., Lederle, T., Fricke, W. & Morando, B. 1977,
-**     Astron.Astrophys. 58, 1-16
-**
-**     Mathews, P.M., Herring, T.A., Buffet, B.A. 2002, J.Geophys.Res.
-**     107, B4.  The MHB_2000 code itself was obtained on 9th September
-**     2002 from ftp//maia.usno.navy.mil/conv2000/chapter5/IAU2000A.
-**
-**     Simon, J.-L., Bretagnon, P., Chapront, J., Chapront-Touze, M.,
-**     Francou, G., Laskar, J. 1994, Astron.Astrophys. 282, 663-683
-**
-**     Souchay, J., Loysel, B., Kinoshita, H., Folgueira, M. 1999,
-**     Astron.Astrophys.Supp.Ser. 135, 111
-**
-**     Wallace, P.T., "Software for Implementing the IAU 2000
-**     Resolutions", in IERS Workshop 5.1 (2002)
-**
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
-**  Derived, with permission, from the SOFA library.  See notes at end of file.
-*/
-{
-   var dpsi = 0.0;;
-   var deps = 0.0;;
-   var _rv1;
-
-   var t, fj2, dp, de;
-
-
-/* Interval between fundamental date J2000.0 and given date (JC). */
-   t = ((date1 - ERFA_DJ00) + date2) / ERFA_DJC;
-
-/* Factor correcting for secular variation of J2. */
-   fj2 = -2.7774e-6 * t;
-
-/* Obtain IAU 2000A nutation. */
-   (_rv1 = eraNut00a(date1, date2))[0];
-   dp = _rv1[0];
-   de = _rv1[1];
-
-/* Apply P03 adjustments (Wallace & Capitaine, 2006, Eqs.5). */
-   dpsi = dp + dp * (0.4697e-6 + fj2);
-   deps = de + de * fj2;
-
-   return [dpsi, deps];
-
-}
-;
 
 // export functions
-//era.a2af    = eraA2af;
-//era.a2tf    = eraA2tf;
 era.ab      = eraAb;
-//era.af2a    = eraAf2a;
 era.anp     = eraAnp;
-//era.anpm    = eraAnpm;
-//era.apcg    = eraApcg;
-//era.apcg13  = eraApcg13;
-//era.apci    = eraApci;
-//era.apci13  = eraApci13;
-//era.apco    = eraApco;
-//era.apco13  = eraApco13;
-//era.apcs    = eraApcs;
-//era.apcs13  = eraApcs13;
-//era.aper    = eraAper;
-//era.aper13  = eraAper13;
-//era.apio    = eraApio;
-//era.apio13  = eraApio13;
-//era.atci13  = eraAtci13;
-//era.atciq   = eraAtciq;
-//era.atciqn  = eraAtciqn;
-//era.atciqz  = eraAtciqz;
-//era.atco13  = eraAtco13;
-//era.atic13  = eraAtic13;
-//era.aticq   = eraAticq;
-//era.aticqn  = eraAticqn;
-//era.atio13  = eraAtio13;
-//era.atioq   = eraAtioq;
-//era.atoc13  = eraAtoc13;
-//era.atoi13  = eraAtoi13;
-//era.atoiq   = eraAtoiq;
-//era.bi00    = eraBi00;
-//era.bp00    = eraBp00;
-//era.bp06    = eraBp06;
-//era.bpn2xy  = eraBpn2xy;
-//era.c2i00a  = eraC2i00a;
-//era.c2i00b  = eraC2i00b;
-//era.c2i06a  = eraC2i06a;
-//era.c2ibpn  = eraC2ibpn;
-//era.c2ixy   = eraC2ixy;
-//era.c2ixys  = eraC2ixys;
-//era.c2s     = eraC2s;
-//era.c2t00a  = eraC2t00a;
-//era.c2t00b  = eraC2t00b;
-//era.c2t06a  = eraC2t06a;
-//era.c2tcio  = eraC2tcio;
-//era.c2teqx  = eraC2teqx;
-//era.c2tpe   = eraC2tpe;
-//era.c2txy   = eraC2txy;
 era.cal2jd  = eraCal2jd;
 era.cp      = eraCp;
-//era.cpv     = eraCpv;
 era.cr      = eraCr;
-//era.d2dtf   = eraD2dtf;
-//era.d2tf    = eraD2tf;
 era.dat     = eraDat;
-//era.dtdb    = eraDtdb;
-//era.dtf2d   = eraDtf2d;
-//era.ee00    = eraEe00;
-//era.ee00a   = eraEe00a;
-//era.ee00b   = eraEe00b;
-//era.ee06a   = eraEe06a;
-//era.eect00  = eraEect00;
 era.eform   = eraEform;
-//era.eo06a   = eraEo06a;
-//era.eors    = eraEors;
-//era.epb     = eraEpb;
-//era.epb2jd  = eraEpb2jd;
-//era.epj     = eraEpj;
-//era.epj2jd  = eraEpj2jd;
-//era.epv00   = eraEpv00;
-//era.eqeq94  = eraEqeq94;
 era.era00   = eraEra00;
-//era.fad03   = eraFad03;
-//era.fae03   = eraFae03;
-//era.faf03   = eraFaf03;
-//era.faju03  = eraFaju03;
-//era.fal03   = eraFal03;
-//era.falp03  = eraFalp03;
-//era.fama03  = eraFama03;
-//era.fame03  = eraFame03;
-//era.fane03  = eraFane03;
-//era.faom03  = eraFaom03;
-//era.fapa03  = eraFapa03;
-//era.fasa03  = eraFasa03;
-//era.faur03  = eraFaur03;
-//era.fave03  = eraFave03;
-//era.fk52h   = eraFk52h;
-//era.fk5hip  = eraFk5hip;
-//era.fk5hz   = eraFk5hz;
 era.fw2m    = eraFw2m;
-//era.fw2xy   = eraFw2xy;
-//era.gc2gd   = eraGc2gd;
-//era.gc2gde  = eraGc2gde;
 era.gd2gc   = eraGd2gc;
 era.gd2gce  = eraGd2gce;
 era.gmst00  = eraGmst00;
-//era.gmst06  = eraGmst06;
-//era.gmst82  = eraGmst82;
 era.gst00a  = eraGst00a;
-//era.gst00b  = eraGst00b;
-//era.gst06   = eraGst06;
-//era.gst06a  = eraGst06a;
-//era.gst94   = eraGst94;
-//era.h2fk5   = eraH2fk5;
-//era.hfk5z   = eraHfk5z;
 era.ir      = eraIr;
 era.jd2cal  = eraJd2cal;
-//era.jdcalf  = eraJdcalf;
-//era.ld      = eraLd;
-//era.ldn     = eraLdn;
-//era.ldsun   = eraLdsun;
 era.num00a  = eraNum00a;
-//era.num00b  = eraNum00b;
-//era.num06a  = eraNum06a;
-//era.numat   = eraNumat;
-//era.nut00a  = eraNut00a;
-//era.nut00b  = eraNut00b;
-//era.nut06a  = eraNut06a;
-//era.nut80   = eraNut80;
-//era.nutm80  = eraNutm80;
 era.obl06   = eraObl06;
-//era.obl80   = eraObl80;
-//era.p06e    = eraP06e;
-//era.p2pv    = eraP2pv;
-//era.p2s     = eraP2s;
-//era.pap     = eraPap;
-//era.pas     = eraPas;
-//era.pb06    = eraPb06;
 era.pdp     = eraPdp;
 era.pfw06   = eraPfw06;
-//era.plan94  = eraPlan94;
-//era.pm      = eraPm;
-//era.pmat00  = eraPmat00;
-//era.pmat06  = eraPmat06;
-//era.pmat76  = eraPmat76;
-//era.pmp     = eraPmp;
-//era.pmpx    = eraPmpx;
-//era.pmsafe  = eraPmsafe;
-//era.pn      = eraPn;
-//era.pn00    = eraPn00;
-//era.pn00a   = eraPn00a;
-//era.pn00b   = eraPn00b;
-//era.pn06    = eraPn06;
-//era.pn06a   = eraPn06a;
-//era.pnm00a  = eraPnm00a;
-//era.pnm00b  = eraPnm00b;
 era.pnm06a  = eraPnm06a;
-//era.pnm80   = eraPnm80;
 era.pom00   = eraPom00;
-//era.ppp     = eraPpp;
-//era.ppsp    = eraPpsp;
-//era.pr00    = eraPr00;
-//era.prec76  = eraPrec76;
-//era.pv2p    = eraPv2p;
-//era.pv2s    = eraPv2s;
-//era.pvdpv   = eraPvdpv;
-//era.pvm     = eraPvm;
-//era.pvmpv   = eraPvmpv;
-//era.pvppv   = eraPvppv;
-//era.pvstar  = eraPvstar;
 era.pvtob   = eraPvtob;
-//era.pvu     = eraPvu;
-//era.pvup    = eraPvup;
-//era.pvxpv   = eraPvxpv;
-//era.pxp     = eraPxp;
-//era.refco   = eraRefco;
-//era.rm2v    = eraRm2v;
-//era.rv2m    = eraRv2m;
 era.rx      = eraRx;
 era.rxp     = eraRxp;
-//era.rxpv    = eraRxpv;
-//era.rxr     = eraRxr;
 era.ry      = eraRy;
 era.rz      = eraRz;
-//era.s00     = eraS00;
-//era.s00a    = eraS00a;
-//era.s00b    = eraS00b;
-//era.s06     = eraS06;
-//era.s06a    = eraS06a;
-//era.s2c     = eraS2c;
-//era.s2p     = eraS2p;
-//era.s2pv    = eraS2pv;
-//era.s2xpv   = eraS2xpv;
-//era.sepp    = eraSepp;
-//era.seps    = eraSeps;
-//era.sp00    = eraSp00;
-//era.starpm  = eraStarpm;
-//era.starpv  = eraStarpv;
-//era.sxp     = eraSxp;
-//era.sxpv    = eraSxpv;
 era.taitt   = eraTaitt;
 era.taiut1  = eraTaiut1;
-//era.taiutc  = eraTaiutc;
-//era.tcbtdb  = eraTcbtdb;
-//era.tcgtt   = eraTcgtt;
-//era.tdbtcb  = eraTdbtcb;
-//era.tdbtt   = eraTdbtt;
-//era.tf2a    = eraTf2a;
-//era.tf2d    = eraTf2d;
 era.tr      = eraTr;
 era.trxp    = eraTrxp;
-//era.trxpv   = eraTrxpv;
-//era.tttai   = eraTttai;
-//era.tttcg   = eraTttcg;
-//era.tttdb   = eraTttdb;
-//era.ttut1   = eraTtut1;
-//era.ut1tai  = eraUt1tai;
-//era.ut1tt   = eraUt1tt;
-//era.ut1utc  = eraUt1utc;
 era.utctai  = eraUtctai;
 era.utcut1  = eraUtcut1;
-//era.xy06    = eraXy06;
-//era.xys00a  = eraXys00a;
-//era.xys00b  = eraXys00b;
-//era.xys06a  = eraXys06a;
 era.zp      = eraZp;
-//era.zpv     = eraZpv;
-//era.zr      = eraZr;
-//era.ltpequ  = eraLtpequ;
-//era.ltpecl  = eraLtpecl;
-//era.ltpb    = eraLtpb;
-//era.ltp     = eraLtp;
-//era.lteqec  = eraLteqec;
-//era.ltecm   = eraLtecm;
-//era.lteceq  = eraLteceq;
-//era.icrs2g  = eraIcrs2g;
-//era.g2icrs  = eraG2icrs;
-//era.eqec06  = eraEqec06;
-//era.ecm06   = eraEcm06;
-//era.eceq06  = eraEceq06;
-//// added with release 14
-//era.ae2hd   = eraAe2hd;
-//era.hd2ae   = eraHd2ae;
-//era.hd2pa   = eraHd2pa;
-//era.tpors   = eraTpors;
-//era.tporv   = eraTporv;
-//era.tpsts   = eraTpsts;
-//era.tpstv   = eraTpstv;
-//era.tpxes   = eraTpxes;
-//era.tpxev   = eraTpxev;
-//// added with release 15
-//era.fk425   = eraFk425;
-//era.fk45z   = eraFk45z;
-//era.fk524   = eraFk524;
-//era.fk54z   = eraFk54z;
 			;
 })(ERFA)
-/* crc: 8271EBE5E498EC6B6FD45EEC44E0A4DA */
