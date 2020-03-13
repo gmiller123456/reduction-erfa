@@ -171,7 +171,8 @@ function eraAb(pnat, v, s, bm1)
 /* Finished. */
 
 return ppr;
-};
+}
+
 function eraAnp(a)
 {
    var w;
@@ -183,7 +184,7 @@ function eraAnp(a)
    return w;
 
 }
-;
+
 function eraCal2jd(iy, im, id)
 {
    var djm0 = 0.0;;
@@ -226,20 +227,12 @@ function eraCal2jd(iy, im, id)
    return [ j, djm0, djm ];
 
 }
-;
+
 function eraCp(p)
 {
-   var c = [0, 0, 0];;
-
-
-   c[0] = p[0];
-   c[1] = p[1];
-   c[2] = p[2];
-
-   return c;
-
+	return [p[0],p[1],p[2]];
 }
-;
+
 function eraCr(r)
 {
    var c = [ [0,0,0], [0,0,0], [0,0,0] ];;
@@ -254,7 +247,7 @@ function eraCr(r)
    return c;
 
 }
-;
+
 function eraDat(iy, im, id, fd)
 {
    var deltat = 0.0;
@@ -330,45 +323,12 @@ function eraDat(iy, im, id, fd)
    return [ j, deltat ];
 
 }
-;
+
 function eraEform( n)
 {
-   var a = 0.0;;
-   var f = 0.0;;
-
-
-/* Look up a and f for the specified reference ellipsoid. */
-   switch ( n ) {
-
-   case ERFA_WGS84:
-      a = 6378137.0;
-      f = 1.0 / 298.257223563;
-      break;
-
-   case ERFA_GRS80:
-      a = 6378137.0;
-      f = 1.0 / 298.257222101;
-      break;
-
-   case ERFA_WGS72:
-      a = 6378135.0;
-      f = 1.0 / 298.26;
-      break;
-
-   default:
-
-   /* Invalid identifier. */
-      a = 0.0;
-      f = 0.0;
-      return [ -1, a, f  ];
-
-   }
-
-/* OK status. */
-   return [ 0, a, f  ];
-
+   return [ 0, 6378137.0, 1.0 / 298.257223563  ];
 }
-;
+
 function eraEra00(dj1, dj2)
 {
    var d1, d2, t, f, theta;
@@ -491,28 +451,12 @@ function eraGmst00(uta, utb, tta, ttb)
    return gmst;
 
 }
-;
+
 function eraIr()
 {
-   var r = [ [0,0,0], [0,0,0], [0,0,0] ];;
-   if (typeof r == 'undefined') {
-      r = [ [0,0,0], [0,0,0], [0,0,0] ];
-   }
-
-   r[0][0] = 1.0;
-   r[0][1] = 0.0;
-   r[0][2] = 0.0;
-   r[1][0] = 0.0;
-   r[1][1] = 1.0;
-   r[1][2] = 0.0;
-   r[2][0] = 0.0;
-   r[2][1] = 0.0;
-   r[2][2] = 1.0;
-
-   return r;
-
+   return [ [1,0,0], [0,1,0], [0,0,1] ];;
 }
-;
+
 function eraJd2cal(dj1, dj2)
 {
    var iy = 0;;
@@ -570,39 +514,17 @@ function eraJd2cal(dj1, dj2)
 ;
 function eraNum00a(date1, date2)
 {
-   var rmatn = [ [0,0,0], [0,0,0], [0,0,0] ];;
-   if (typeof rmatn == 'undefined') {
-      rmatn = [ [0,0,0], [0,0,0], [0,0,0] ];
-   }   var _rv1;
-
-   var dpsi, deps, epsa, rb = [[], [], []], rp = [[], [], []], rbp = [[], [], []], rbpn = [[], [], []];
-
-
-/* Obtain the required matrix (discarding other results). */
-   (_rv1 = eraPn00a(date1, date2))[0];
-   dpsi = _rv1[0];
-   deps = _rv1[1];
-   epsa = _rv1[2];
-   rb = _rv1[3];
-   rp = _rv1[4];
-   rbp = _rv1[5];
-   rmatn = _rv1[6];
-   rbpn = _rv1[7];
-
-   return rmatn;
-
+	return eraPn00a(date1, date2)[6];
 }
-;
+
 function eraObl06(date1, date2)
 {
-   var t, eps0;
-
 
 /* Interval between fundamental date J2000.0 and given date (JC). */
-   t = ((date1 - ERFA_DJ00) + date2) / ERFA_DJC;
+   const t = ((date1 - ERFA_DJ00) + date2) / ERFA_DJC;
 
 /* Mean obliquity. */
-   eps0 = (84381.406     +
+   const eps0 = (84381.406     +
           (-46.836769    +
           ( -0.0001831   +
           (  0.00200340  +
@@ -696,13 +618,10 @@ function eraPnm06a(date1, date2)
    return rnpb;
 
 }
-;
+
 function eraPom00(xp, yp, sp)
 {
    var rpom = [ [0,0,0], [0,0,0], [0,0,0] ];;
-   if (typeof rpom == 'undefined') {
-      rpom = [ [0,0,0], [0,0,0], [0,0,0] ];
-   }
 
 /* Construct the matrix. */
    rpom = eraIr();
@@ -713,7 +632,7 @@ function eraPom00(xp, yp, sp)
    return rpom;
 
 }
-;
+
 function eraPvtob(elong, phi, hm, xp, yp, sp, theta)
 {
    var pv = [ [0,0,0], [0,0,0] ];;
@@ -753,7 +672,8 @@ function eraPvtob(elong, phi, hm, xp, yp, sp, theta)
 /* Finished. */
 
 return pv;
-};
+}
+
 function eraRx(phi, r)
 {
    if (typeof r == 'undefined') {
@@ -782,7 +702,8 @@ function eraRx(phi, r)
 
    return r;
 
-};
+}
+
 function eraRy(theta, r)
 {
    if (typeof r == 'undefined') {
@@ -811,7 +732,8 @@ function eraRy(theta, r)
 
    return r;
 
-};
+}
+
 function eraRz(psi, r)
 {
    if (typeof r == 'undefined') {
@@ -840,7 +762,8 @@ function eraRz(psi, r)
 
    return r;
 
-};
+}
+
 function eraTaitt(tai1, tai2)
 {
    var tt1 = 0.0;;
@@ -863,7 +786,7 @@ function eraTaitt(tai1, tai2)
 /* Status (always OK). */
    return [ 0, tt1, tt2 ];
 
-};
+}
 function eraTaiut1(tai1, tai2, dta)
 {
    var ut11 = 0.0;;
@@ -886,7 +809,7 @@ function eraTaiut1(tai1, tai2, dta)
 /* Status (always OK). */
    return [ 0, ut11, ut12 ];
 
-};
+}
 function eraTr(r)
 {
    var rt = [ [0,0,0], [0,0,0], [0,0,0] ];;
@@ -1052,18 +975,9 @@ function eraUtcut1(utc1, utc2, dut1)
 ;
 function eraZp(p)
 {
-   if (typeof p == 'undefined') {
-      p = [0, 0, 0];
-   }
-
-   p[0] = 0.0;
-   p[1] = 0.0;
-   p[2] = 0.0;
-
-   return p;
-
+	return [0,0,0];
 }
-;
+
 function eraGst00a(uta, utb, tta, ttb)
 {
    var gmst00, ee00a, gst;
