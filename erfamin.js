@@ -1,6 +1,87 @@
-'use strict';;
-var ERFA = {};;
-(function(era) {;
+/*
+
+Truncated/simplified version of the JavaScript version of ERFA
+Greg Miller gmiller@gregmiller.net
+
+*/
+
+/*
+ *+----------------------------------------------------------------------
+ *
+ *  ERFA/SOFA functions converted to JS
+ *  Copyright (C) 2020 by Marcel Greter
+ *  http:://www.github.com/mgreter/sofa.js
+ *
+ *  The conversion is done by a custom hacked perl script.
+ *  Automatically generates QUnit tests for all functions.
+ *
+ *  Conversion is made from liberfa sources:
+ *  https://github.com/liberfa/erfa
+ *
+ *+----------------------------------------------------------------------
+ *  THIS WORK IS RELEASED UNDER THE SAME TERMS AS ERFA:
+ *+----------------------------------------------------------------------
+ *
+ *  Copyright (C) 2013-2014, NumFOCUS Foundation.
+ *  All rights reserved.
+ *  
+ *  This library is derived, with permission, from the International
+ *  Astronomical Union's "Standards of Fundamental Astronomy" library,
+ *  available from http://www.iausofa.org.
+ *  
+ *  The ERFA version is intended to retain identical
+ *  functionality to the SOFA library, but made distinct through
+ *  different function and file names, as set out in the SOFA license
+ *  conditions. The SOFA original has a role as a reference standard
+ *  for the IAU and IERS, and consequently redistribution is permitted only
+ *  in its unaltered state. The ERFA version is not subject to this
+ *  restriction and therefore can be included in distributions which do not
+ *  support the concept of "read only" software.
+ *  
+ *  Although the intent is to replicate the SOFA API (other than replacement of
+ *  prefix names) and results (with the exception of bugs; any that are
+ *  discovered will be fixed), SOFA is not responsible for any errors found
+ *  in this version of the library.
+ *  
+ *  If you wish to acknowledge the SOFA heritage, please acknowledge that
+ *  you are using a library derived from SOFA, rather than SOFA itself.
+ *  
+ *  
+ *  TERMS AND CONDITIONS
+ *  
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions are met:
+ *  
+ *  1 Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *  
+ *  2 Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  
+ *  3 Neither the name of the Standards Of Fundamental Astronomy Board, the
+ *     International Astronomical Union nor the names of its contributors
+ *     may be used to endorse or promote products derived from this software
+ *     without specific prior written permission.
+ *  
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+ *  IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+ *  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ *  PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ *  HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+ *  TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ *  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ *  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ *-----------------------------------------------------------------------
+*/
+
+'use strict';
+var ERFA = {};
+(function(era) {
 /* Pi */
 var ERFA_DPI = 3.141592653589793238462643;
 
@@ -511,7 +592,7 @@ function eraJd2cal(dj1, dj2)
    return [ 0, iy, im, id, fd ];
 
 }
-;
+
 function eraNum00a(date1, date2)
 {
 	return eraPn00a(date1, date2)[6];
@@ -534,7 +615,7 @@ function eraObl06(date1, date2)
    return eps0;
 
 }
-;
+
 function eraPdp(a, b)
 {
    var w;
@@ -547,7 +628,7 @@ function eraPdp(a, b)
    return w;
 
 }
-;
+
 function eraPfw06(date1, date2)
 {
    var gamb = 0.0;;
@@ -589,7 +670,7 @@ function eraPfw06(date1, date2)
    return [gamb, phib, psib, epsa];
 
 }
-;
+
 function eraPnm06a(date1, date2)
 {
    var rnpb = [ [0,0,0], [0,0,0], [0,0,0] ];;
@@ -830,7 +911,7 @@ function eraTr(r)
 
    return rt;
 
-};
+}
 function eraTrxp(r, p)
 {
    var trp = [0, 0, 0];;
@@ -848,7 +929,7 @@ function eraTrxp(r, p)
    return trp;
 
 }
-;
+
 function eraUtctai(utc1, utc2)
 {
    var tai1 = 0.0;;
@@ -929,7 +1010,7 @@ function eraUtctai(utc1, utc2)
    return [ j, tai1, tai2 ];
 
 }
-;
+
 function eraUtcut1(utc1, utc2, dut1)
 {
    var ut11 = 0.0;;
@@ -972,7 +1053,7 @@ function eraUtcut1(utc1, utc2, dut1)
    return [ js, ut11, ut12 ];
 
 }
-;
+
 function eraZp(p)
 {
 	return [0,0,0];
@@ -990,7 +1071,7 @@ function eraGst00a(uta, utb, tta, ttb)
    return gst;
 
 }
-;
+
 
 function eraEe00a(date1, date2)
 {
@@ -1018,7 +1099,7 @@ function eraEe00a(date1, date2)
    return ee;
 
 }
-;
+
 function eraPr00(date1, date2)
 {
    var dpsipr = 0.0;;
@@ -1042,7 +1123,7 @@ function eraPr00(date1, date2)
    return [dpsipr, depspr];
 
 }
-;
+
 function eraObl80(date1, date2)
 {
    var t, eps0;
@@ -1060,7 +1141,7 @@ function eraObl80(date1, date2)
    return eps0;
 
 }
-;
+
 
 function eraFal03(t)
 {
@@ -1077,7 +1158,7 @@ function eraFal03(t)
    return a;
 
 }
-;
+
 function eraFaf03(t)
 {
    var a;
@@ -1095,7 +1176,7 @@ function eraFaf03(t)
 
 
 }
-;
+
 function eraFaom03(t)
 {
    var a;
@@ -1112,7 +1193,7 @@ function eraFaom03(t)
    return a;
 
 }
-;
+
 function eraFapa03(t)
 {
    var a;
@@ -1124,7 +1205,7 @@ function eraFapa03(t)
    return a;
 
 }
-;
+
 function eraFame03(t)
 {
    var a;
@@ -1136,7 +1217,7 @@ function eraFame03(t)
    return a;
 
 }
-;
+
 function eraFave03(t)
 {
    var a;
@@ -1148,7 +1229,7 @@ function eraFave03(t)
    return a;
 
 }
-;
+
 function eraFae03(t)
 {
    var a;
@@ -1160,7 +1241,7 @@ function eraFae03(t)
    return a;
 
 }
-;
+
 function eraFama03(t)
 {
    var a;
@@ -1172,7 +1253,7 @@ function eraFama03(t)
    return a;
 
 }
-;
+
 function eraFaju03(t)
 {
    var a;
@@ -1184,7 +1265,7 @@ function eraFaju03(t)
    return a;
 
 }
-;
+
 function eraFasa03(t)
 {
    var a;
@@ -1196,7 +1277,7 @@ function eraFasa03(t)
    return a;
 
 }
-;
+
 function eraFaur03(t)
 {
    var a;
@@ -1208,7 +1289,7 @@ function eraFaur03(t)
    return a;
 
 }
-;
+
 function eraEe00(date1, date2, epsa, dpsi)
 {
    var ee;
@@ -1220,7 +1301,7 @@ function eraEe00(date1, date2, epsa, dpsi)
    return ee;
 
 }
-;
+
 function eraEect00(date1, date2)
 {
 /* Time since J2000.0, in Julian centuries */
@@ -1352,7 +1433,7 @@ function eraEect00(date1, date2)
    return eect;
 
 }
-;
+
 function eraFalp03(t)
 {
    var a;
@@ -1368,7 +1449,7 @@ function eraFalp03(t)
    return a;
 
 }
-;
+
 function eraFad03(t)
 {
    var a;
@@ -1384,7 +1465,7 @@ function eraFad03(t)
    return a;
 
 }
-;
+
 function eraRxp(r, p)
 {
    var rp = [0, 0, 0];;
@@ -1409,7 +1490,7 @@ function eraRxp(r, p)
    return rp;
 
 }
-;
+
 function eraNut06a(date1, date2)
 {
    var dpsi = 0.0;;
@@ -1437,7 +1518,6 @@ function eraNut06a(date1, date2)
    return [dpsi, deps];
 
 }
-;
 
 function eraNut00a(date1, date2)
 {
@@ -3262,42 +3342,16 @@ function eraNut00a(date1, date2)
    return [dpsi, deps];
 
 }
-;
-
 
 // export functions
 era.ab      = eraAb;
-era.anp     = eraAnp;
-era.cal2jd  = eraCal2jd;
-era.cp      = eraCp;
-era.cr      = eraCr;
-era.dat     = eraDat;
-era.eform   = eraEform;
-era.era00   = eraEra00;
-era.fw2m    = eraFw2m;
-era.gd2gc   = eraGd2gc;
-era.gd2gce  = eraGd2gce;
-era.gmst00  = eraGmst00;
 era.gst00a  = eraGst00a;
-era.ir      = eraIr;
-era.jd2cal  = eraJd2cal;
-era.num00a  = eraNum00a;
-era.obl06   = eraObl06;
-era.pdp     = eraPdp;
-era.pfw06   = eraPfw06;
 era.pnm06a  = eraPnm06a;
-era.pom00   = eraPom00;
 era.pvtob   = eraPvtob;
-era.rx      = eraRx;
 era.rxp     = eraRxp;
-era.ry      = eraRy;
-era.rz      = eraRz;
 era.taitt   = eraTaitt;
-era.taiut1  = eraTaiut1;
 era.tr      = eraTr;
-era.trxp    = eraTrxp;
 era.utctai  = eraUtctai;
 era.utcut1  = eraUtcut1;
-era.zp      = eraZp;
-			;
+
 })(ERFA)
